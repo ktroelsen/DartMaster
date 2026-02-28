@@ -585,58 +585,66 @@ function GameMoon({
   const [currentDartIndex, setCurrentDartIndex] = useState(0);
   const [currentTurnDarts, setCurrentTurnDarts] = useState<number[]>([]);
   const [winner, setWinner] = useState<Player | null>(null);
+  const [round, setRound] = useState(1);
+  const MAX_ROUNDS = 7;
 
   const handleScoreInput = (num: number) => {
     if (gameState !== 'playing') return;
 
     const updatedPlayers = [...players];
     const currentPlayer = updatedPlayers[currentPlayerIndex];
-    let stepChange = 0;
 
     // Check if hit own number
     if (num === currentPlayer.targetNumber) {
       currentPlayer.moonSteps = Math.min(10, (currentPlayer.moonSteps || 0) + 1);
-      stepChange = 1;
     } 
     // Check if hit someone else's number
     else {
       const victimIndex = updatedPlayers.findIndex(p => p.targetNumber === num);
       if (victimIndex !== -1 && victimIndex !== currentPlayerIndex) {
         updatedPlayers[victimIndex].moonSteps = Math.max(0, (updatedPlayers[victimIndex].moonSteps || 0) - 1);
-        stepChange = -1;
       }
     }
 
     const newTurnDarts = [...currentTurnDarts, num];
     
-    if (currentPlayer.moonSteps === 10) {
-      setWinner(currentPlayer);
-      setGameState('won');
-      
-      // Calculate rankings based on steps with tie handling
-      const distinctSteps = Array.from(new Set(updatedPlayers.map(p => p.moonSteps || 0))).sort((a, b) => b - a);
-      const rankings = updatedPlayers.map(p => {
-        const step = p.moonSteps || 0;
-        const rankIndex = distinctSteps.indexOf(step);
-        let points = 0;
-        if (rankIndex === 0) points = 10;
-        else if (rankIndex === 1) points = 5;
-        else if (rankIndex === 2) points = 2;
-        return { name: p.name, points };
-      });
-      onGameEnd(rankings);
-      return;
-    }
-
     if (currentDartIndex < 2) {
       setCurrentDartIndex(currentDartIndex + 1);
       setCurrentTurnDarts(newTurnDarts);
     } else {
+      // End of turn
       currentPlayer.history.push(newTurnDarts);
       setPlayers(updatedPlayers);
       setCurrentDartIndex(0);
       setCurrentTurnDarts([]);
-      setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
+      
+      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+      if (nextPlayerIdx === 0) {
+        // End of round
+        if (round >= MAX_ROUNDS || updatedPlayers.some(p => p.moonSteps === 10)) {
+          // Game Over
+          const sortedByProgress = [...updatedPlayers].sort((a, b) => (b.moonSteps || 0) - (a.moonSteps || 0));
+          setWinner(sortedByProgress[0]);
+          setGameState('won');
+          
+          const distinctSteps = Array.from(new Set(updatedPlayers.map(p => p.moonSteps || 0))).sort((a, b) => b - a);
+          const rankings = updatedPlayers.map(p => {
+            const step = p.moonSteps || 0;
+            const rankIndex = distinctSteps.indexOf(step);
+            let points = 0;
+            if (rankIndex === 0) points = 10;
+            else if (rankIndex === 1) points = 5;
+            else if (rankIndex === 2) points = 2;
+            return { name: p.name, points };
+          });
+          onGameEnd(rankings);
+        } else {
+          setRound(round + 1);
+          setCurrentPlayerIndex(0);
+        }
+      } else {
+        setCurrentPlayerIndex(nextPlayerIdx);
+      }
     }
   };
 
@@ -672,6 +680,11 @@ function GameMoon({
         </div>
 
         {/* Moon (Top) */}
+        <div className="relative z-20 text-center mb-8">
+          <div className="text-xs font-mono uppercase tracking-[0.5em] text-blue-400 mb-2">Lunar Mission</div>
+          <h2 className="text-5xl font-display italic font-black text-white">ROUND {round}<span className="text-blue-400">/{MAX_ROUNDS}</span></h2>
+        </div>
+
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
@@ -960,20 +973,20 @@ function GameAround({
         </div>
 
         <div className="relative z-10 text-center mb-12">
-          <div className="text-xs font-mono uppercase tracking-[0.5em] text-green-500 mb-2">Global Expedition</div>
-          <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-green-500">/{MAX_ROUNDS}</span></h2>
+          <div className="text-xs font-mono uppercase tracking-[0.5em] text-blue-500 mb-2">Global Expedition</div>
+          <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-blue-500">/{MAX_ROUNDS}</span></h2>
         </div>
 
         {/* The Globe / Dartboard */}
         <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
           {/* Globe Sphere */}
-          <div className="absolute inset-0 rounded-full bg-blue-950/40 border-4 border-zinc-800 shadow-[0_0_100px_rgba(34,197,94,0.1)] overflow-hidden">
+          <div className="absolute inset-0 rounded-full bg-blue-900 border-4 border-zinc-800 shadow-[0_0_100px_rgba(37,99,235,0.2)] overflow-hidden">
             {/* Earth Landmasses (Abstract) */}
-            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full opacity-30">
-              <path d="M20,40 C30,30 40,30 50,40 S70,50 80,40 S90,60 80,70 S60,80 40,75 S10,60 20,40" fill="#22c55e" />
-              <path d="M70,15 C80,10 90,15 95,25 S85,40 75,35 S65,20 70,15" fill="#22c55e" />
-              <path d="M15,15 C25,10 35,15 30,25 S20,35 10,30 S5,20 15,15" fill="#22c55e" />
-              <path d="M40,85 C50,80 60,85 65,95 S55,105 45,100 S35,90 40,85" fill="#22c55e" />
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full opacity-40">
+              <path d="M20,40 C30,30 40,30 50,40 S70,50 80,40 S90,60 80,70 S60,80 40,75 S10,60 20,40" fill="#60a5fa" />
+              <path d="M70,15 C80,10 90,15 95,25 S85,40 75,35 S65,20 70,15" fill="#60a5fa" />
+              <path d="M15,15 C25,10 35,15 30,25 S20,35 10,30 S5,20 15,15" fill="#60a5fa" />
+              <path d="M40,85 C50,80 60,85 65,95 S55,105 45,100 S35,90 40,85" fill="#60a5fa" />
             </svg>
 
             {/* Latitude/Longitude Lines */}
@@ -1000,7 +1013,7 @@ function GameAround({
                     <path
                       d="M 50 50 L 50 0 A 50 50 0 0 1 65.45 2.45 Z"
                       transform={`rotate(${angle} 50 50)`}
-                      className={`transition-all duration-500 ${isTarget ? 'fill-green-500 opacity-60 animate-pulse' : 'fill-transparent stroke-white/10 stroke-[0.2]'}`}
+                      className={`transition-all duration-500 ${isTarget ? 'fill-blue-400 opacity-60 animate-pulse' : 'fill-transparent stroke-white/10 stroke-[0.2]'}`}
                     />
                     <text 
                       x={tx} 
@@ -1017,12 +1030,12 @@ function GameAround({
                   </g>
                 );
               })}
-              <circle cx="50" cy="50" r="10" className="fill-black/40 stroke-green-500/20 stroke-1" />
+              <circle cx="50" cy="50" r="10" className="fill-black/40 stroke-blue-500/20 stroke-1" />
             </svg>
           </div>
 
           {/* Target Indicator */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-black font-display text-4xl px-6 py-2 italic font-black shadow-lg">
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-black font-display text-4xl px-6 py-2 italic font-black shadow-lg">
             TARGET: {currentTarget}
           </div>
 
@@ -1034,7 +1047,7 @@ function GameAround({
               style={{ padding: `${i * 15}px` }}
             >
               <div 
-                className={`w-full h-full rounded-full border-2 transition-all duration-1000 ${i === currentPlayerIndex ? 'border-green-500 opacity-100' : 'border-white/10 opacity-30'}`}
+                className={`w-full h-full rounded-full border-2 transition-all duration-1000 ${i === currentPlayerIndex ? 'border-blue-500 opacity-100' : 'border-white/10 opacity-30'}`}
                 style={{ 
                   clipPath: `conic-gradient(from 0deg, white ${(p.aroundNumber || 1) / 20 * 360}deg, transparent 0deg)`
                 }}
@@ -1048,14 +1061,14 @@ function GameAround({
           {players.map((p, i) => (
             <div 
               key={i} 
-              className={`p-4 border-2 transition-all ${i === currentPlayerIndex ? 'border-green-500 bg-green-500/10' : 'border-zinc-800 bg-black/40'}`}
+              className={`p-4 border-2 transition-all ${i === currentPlayerIndex ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-800 bg-black/40'}`}
             >
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{p.name}</div>
               <div className="flex justify-between items-end">
                 <div className="text-3xl font-display italic font-black text-white">{p.aroundNumber}/20</div>
                 <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-green-500 transition-all duration-500"
+                    className="h-full bg-blue-500 transition-all duration-500"
                     style={{ width: `${((p.aroundNumber || 1) / 20) * 100}%` }}
                   ></div>
                 </div>
@@ -1071,11 +1084,11 @@ function GameAround({
             className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
           >
             <Trophy size={120} className="text-yellow-400 mb-8 animate-bounce" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-green-500 mb-4">World Champion</h2>
+            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-blue-500 mb-4">World Champion</h2>
             <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
             <button 
               onClick={onGoHome}
-              className="bg-green-600 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+              className="bg-blue-600 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
             >
               Return Home
             </button>
@@ -1090,8 +1103,8 @@ function GameAround({
             <ArrowLeft size={14} /> Abandon Mission
           </button>
           
-          <div className="p-6 bg-green-600/10 border-2 border-green-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-green-400 mb-2">Current Player</div>
+          <div className="p-6 bg-blue-600/10 border-2 border-blue-600 rounded-2xl mb-8">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-2">Current Player</div>
             <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
             <div className="flex items-center gap-4 mt-4">
               <div className="text-xs font-mono text-zinc-400">Next Target:</div>
@@ -1105,9 +1118,9 @@ function GameAround({
                 key={dartIdx}
                 className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
-                    ? 'bg-green-600 border-green-500 text-black' 
+                    ? 'bg-blue-600 border-blue-500 text-black' 
                     : dartIdx === currentDartIndex 
-                      ? 'border-green-500 text-green-500 animate-pulse' 
+                      ? 'border-blue-500 text-blue-500 animate-pulse' 
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
@@ -1125,7 +1138,7 @@ function GameAround({
               onClick={() => setMultiplier(m as 1 | 2 | 3)}
               className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
                 multiplier === m 
-                  ? 'bg-green-600 border-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]' 
+                  ? 'bg-blue-600 border-blue-500 text-black shadow-[0_0_20px_rgba(37,99,235,0.3)]' 
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
               }`}
             >
@@ -1142,7 +1155,7 @@ function GameAround({
               disabled={gameState !== 'playing'}
               className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
                 num === currentTarget
-                  ? 'border-green-500 bg-green-600/20 text-white hover:bg-green-600 hover:text-black'
+                  ? 'border-blue-500 bg-blue-600/20 text-white hover:bg-blue-600 hover:text-black'
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
               }`}
             >
