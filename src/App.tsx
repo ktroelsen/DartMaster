@@ -114,7 +114,7 @@ function HomePage({
           <div className="inline-block mb-4 p-3 rounded-full bg-red-600/20 border border-red-500/30">
             <Target size={48} className="text-red-500" />
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-2 italic font-serif text-white drop-shadow-2xl">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-2 italic font-display text-white drop-shadow-2xl">
             DART<span className="text-red-600">MASTER</span>
           </h1>
           <p className="text-sm opacity-80 uppercase tracking-[0.4em] font-mono text-green-500 font-bold">Tournament Edition</p>
@@ -125,7 +125,7 @@ function HomePage({
           <div className="lg:col-span-2 space-y-8">
             <section className="bg-zinc-900/80 backdrop-blur-md border-2 border-zinc-800 p-8 shadow-2xl">
               <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-                <h2 className="text-3xl font-serif italic font-bold text-white">TOURNAMENT STANDINGS</h2>
+                <h2 className="text-3xl font-display italic font-bold text-white">TOURNAMENT STANDINGS</h2>
                 <button 
                   onClick={onReset}
                   className="text-[10px] font-mono uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors"
@@ -142,7 +142,7 @@ function HomePage({
                         <div className={`w-8 h-8 flex items-center justify-center font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
                           {idx + 1}
                         </div>
-                        <span className="text-xl font-serif italic text-white">{p.name}</span>
+                        <span className="text-xl font-serif text-white">{p.name}</span>
                       </div>
                       <div className="flex items-center gap-6">
                         <div className="text-right">
@@ -172,7 +172,7 @@ function HomePage({
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                   placeholder="Enter Player Name..."
-                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-3 px-4 focus:outline-none focus:border-green-500 text-white font-serif italic"
+                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-3 px-4 focus:outline-none focus:border-green-500 text-white font-serif"
                 />
                 <button 
                   onClick={addPlayer}
@@ -195,7 +195,7 @@ function HomePage({
             >
               <div className="relative z-10">
                 <Target size={32} className="text-red-500 group-hover:text-white mb-8 transition-colors" />
-                <h2 className="text-3xl font-bold mb-2 italic font-serif group-hover:text-white">301 DOWN</h2>
+                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">301 DOWN</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Countdown to zero.</p>
               </div>
             </button>
@@ -210,7 +210,7 @@ function HomePage({
                   <Target size={32} className="text-blue-500 group-hover:text-white transition-colors" />
                   <span className="bg-blue-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
                 </div>
-                <h2 className="text-3xl font-bold mb-2 italic font-serif group-hover:text-white">TO THE MOON</h2>
+                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">TO THE MOON</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Race to the lunar surface.</p>
               </div>
             </button>
@@ -373,7 +373,7 @@ function Game301({
               )}
               
               <div className="flex justify-between items-end mb-4">
-                <h3 className="text-2xl font-serif italic font-black uppercase text-white chalk-text">{p.name}</h3>
+                <h3 className="text-2xl font-serif font-black uppercase text-white chalk-text">{p.name}</h3>
                 <div className="font-mono text-sm text-white/40">#{idx + 1}</div>
               </div>
               
@@ -431,7 +431,7 @@ function Game301({
               </div>
               <div>
                 <div className="text-sm font-mono uppercase tracking-[0.4em] text-white/70 mb-1">Champion</div>
-                <div className="text-6xl font-serif italic font-black uppercase tracking-tight">{winner.name}</div>
+                <div className="text-6xl font-display italic font-black uppercase tracking-tight">{winner.name}</div>
               </div>
             </div>
           </motion.div>
@@ -446,7 +446,7 @@ function Game301({
           <button
             onClick={handleUndo}
             disabled={gameState !== 'playing' || (currentDartIndex === 0 && players.every(p => p.history.length === 0))}
-            className="w-full py-4 flex items-center justify-center gap-4 border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-lg italic font-serif shadow-[0_0_15px_rgba(220,38,38,0.2)]"
+            className="w-full py-4 flex items-center justify-center gap-4 border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-lg italic font-display shadow-[0_0_15px_rgba(220,38,38,0.2)]"
           >
             <RotateCcw size={20} />
             UNDO LAST SHOT
@@ -578,12 +578,17 @@ function GameMoon({
       setWinner(currentPlayer);
       setGameState('won');
       
-      // Calculate rankings based on steps
-      const sortedBySteps = [...updatedPlayers].sort((a, b) => (b.moonSteps || 0) - (a.moonSteps || 0));
-      const rankings = sortedBySteps.map((p, idx) => ({
-        name: p.name,
-        points: idx === 0 ? 10 : idx === 1 ? 5 : idx === 2 ? 2 : 0
-      }));
+      // Calculate rankings based on steps with tie handling
+      const distinctSteps = Array.from(new Set(updatedPlayers.map(p => p.moonSteps || 0))).sort((a, b) => b - a);
+      const rankings = updatedPlayers.map(p => {
+        const step = p.moonSteps || 0;
+        const rankIndex = distinctSteps.indexOf(step);
+        let points = 0;
+        if (rankIndex === 0) points = 10;
+        else if (rankIndex === 1) points = 5;
+        else if (rankIndex === 2) points = 2;
+        return { name: p.name, points };
+      });
       onGameEnd(rankings);
       return;
     }
@@ -681,7 +686,7 @@ function GameMoon({
                 <div className={`text-xs font-mono uppercase tracking-tighter mb-1 ${idx === currentPlayerIndex ? 'text-blue-400 font-bold' : 'text-zinc-500'}`}>
                   {p.name}
                 </div>
-                <div className="text-2xl font-black font-serif italic text-white">
+                <div className="text-2xl font-black font-display italic text-white">
                   #{p.targetNumber}
                 </div>
                 <div className="text-[10px] font-mono text-zinc-600 mt-1">
@@ -695,7 +700,7 @@ function GameMoon({
         {/* Earth (Bottom) */}
         <div className="relative z-10 w-full h-32 bg-blue-900 rounded-t-[100%] shadow-[0_-20px_100px_rgba(37,99,235,0.3)] flex items-center justify-center overflow-hidden border-t-4 border-blue-400/30">
           <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-          <div className="text-white/20 font-black text-6xl italic font-serif tracking-widest uppercase">EARTH</div>
+          <div className="text-white/20 font-black text-6xl italic font-display tracking-widest uppercase">EARTH</div>
         </div>
 
         {/* Win Overlay */}
@@ -707,7 +712,7 @@ function GameMoon({
           >
             <Trophy size={120} className="text-yellow-400 mb-8 drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
             <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-blue-400 mb-4">Mission Accomplished</h2>
-            <h3 className="text-7xl font-serif italic font-black text-white mb-12">{winner.name} Reached the Moon!</h3>
+            <h3 className="text-7xl font-display italic font-black text-white mb-12">{winner.name} Reached the Moon!</h3>
             <button 
               onClick={onGoHome}
               className="bg-white text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all"
@@ -727,10 +732,10 @@ function GameMoon({
           
           <div className="p-6 bg-blue-600/10 border-2 border-blue-600 rounded-2xl mb-8">
             <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-2">Current Pilot</div>
-            <div className="text-4xl font-serif italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
             <div className="flex items-center gap-4 mt-4">
               <div className="text-xs font-mono text-zinc-400">Target Number:</div>
-              <div className="text-3xl font-black text-white">#{players[currentPlayerIndex].targetNumber}</div>
+              <div className="text-3xl font-black text-white font-display">#{players[currentPlayerIndex].targetNumber}</div>
             </div>
           </div>
 
@@ -766,7 +771,7 @@ function GameMoon({
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
               }`}
             >
-              <span className="text-2xl font-black font-serif italic">{num}</span>
+              <span className="text-2xl font-black font-display italic">{num}</span>
               {players.find(p => p.targetNumber === num) && (
                 <span className="text-[8px] font-mono uppercase mt-1 opacity-60">
                   {players.find(p => p.targetNumber === num)?.name.slice(0, 3)}
@@ -778,7 +783,7 @@ function GameMoon({
           <button
             onClick={() => handleScoreInput(0)}
             disabled={gameState !== 'playing'}
-            className="col-span-4 py-6 text-xl font-black font-serif italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
           >
             MISS
           </button>
@@ -787,7 +792,7 @@ function GameMoon({
         <button
           onClick={handleUndo}
           disabled={gameState !== 'playing' || currentDartIndex === 0}
-          className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-serif"
+          className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
         >
           <RotateCcw size={18} />
           UNDO LAST DART
