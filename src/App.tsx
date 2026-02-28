@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { Home, Trophy, User, RotateCcw, ArrowLeft, Target, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type View = 'home' | '301' | 'moon' | 'around';
+type View = 'home' | '301' | 'moon' | 'around' | 'football';
 
 interface Player {
   name: string;
@@ -17,6 +17,7 @@ interface Player {
   targetNumber?: number;
   moonSteps?: number;
   aroundNumber?: number;
+  footballGoals?: number;
 }
 
 export default function App() {
@@ -62,8 +63,14 @@ export default function App() {
             onGoHome={() => setView('home')}
             onGameEnd={handleUpdateTournamentPoints}
           />
-        ) : (
+        ) : view === 'around' ? (
           <GameAround
+            initialPlayers={tournamentPlayers}
+            onGoHome={() => setView('home')}
+            onGameEnd={handleUpdateTournamentPoints}
+          />
+        ) : (
+          <GameFootball
             initialPlayers={tournamentPlayers}
             onGoHome={() => setView('home')}
             onGameEnd={handleUpdateTournamentPoints}
@@ -82,7 +89,7 @@ function HomePage({
 }: { 
   players: Player[]; 
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
-  onSelectGame: (game: '301' | 'moon' | 'around') => void;
+  onSelectGame: (game: '301' | 'moon' | 'around' | 'football') => void;
   onReset: () => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -234,6 +241,21 @@ function HomePage({
                 </div>
                 <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">AROUND THE WORLD</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Hit 1-20 in order. 7 rounds to finish.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => onSelectGame('football')}
+              disabled={players.length < 1}
+              className="w-full group relative bg-zinc-900 border-2 border-emerald-500 p-8 hover:bg-emerald-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.1)] disabled:opacity-20 disabled:grayscale"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-8">
+                  <Target size={32} className="text-emerald-500 group-hover:text-white transition-colors" />
+                  <span className="bg-emerald-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">FOOTBALL</h2>
+                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Pass the ball and score goals. 7 rounds of action.</p>
               </div>
             </button>
           </div>
@@ -1175,6 +1197,446 @@ function GameAround({
         <button
           onClick={handleUndo}
           disabled={gameState !== 'playing' || currentDartIndex === 0}
+          className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
+        >
+          <RotateCcw size={18} />
+          UNDO LAST DART
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type FootballNode = 'goalL' | 'posL' | 'posTL' | 'posBL' | 'posC' | 'posTR' | 'posBR' | 'posR' | 'goalR';
+
+const FOOTBALL_CONNECTIONS: Record<FootballNode, { target: FootballNode; weight: number }[]> = {
+  goalL: [{ target: 'posL', weight: 1 }],
+  posL: [{ target: 'goalL', weight: 1 }, { target: 'posTL', weight: 1 }, { target: 'posBL', weight: 1 }],
+  posTL: [{ target: 'posL', weight: 1 }, { target: 'posC', weight: 1 }, { target: 'posTR', weight: 2 }],
+  posBL: [{ target: 'posL', weight: 1 }, { target: 'posC', weight: 1 }, { target: 'posBR', weight: 2 }],
+  posC: [{ target: 'posTL', weight: 1 }, { target: 'posBL', weight: 1 }, { target: 'posTR', weight: 1 }, { target: 'posBR', weight: 1 }],
+  posTR: [{ target: 'posTL', weight: 2 }, { target: 'posC', weight: 1 }, { target: 'posR', weight: 1 }],
+  posBR: [{ target: 'posBL', weight: 2 }, { target: 'posC', weight: 1 }, { target: 'posR', weight: 1 }],
+  posR: [{ target: 'posTR', weight: 1 }, { target: 'posBR', weight: 1 }, { target: 'goalR', weight: 1 }],
+  goalR: [{ target: 'posR', weight: 1 }]
+};
+
+const NODE_POSITIONS: Record<FootballNode, { x: number; y: number; label: string }> = {
+  goalL: { x: 5, y: 50, label: 'GOAL L' },
+  posL: { x: 20, y: 50, label: 'DEF L' },
+  posTL: { x: 35, y: 25, label: 'MID TL' },
+  posBL: { x: 35, y: 75, label: 'MID BL' },
+  posC: { x: 50, y: 50, label: 'CENTER' },
+  posTR: { x: 65, y: 25, label: 'MID TR' },
+  posBR: { x: 65, y: 75, label: 'MID BR' },
+  posR: { x: 80, y: 50, label: 'DEF R' },
+  goalR: { x: 95, y: 50, label: 'GOAL R' }
+};
+
+function GameFootball({ 
+  initialPlayers, 
+  onGoHome, 
+  onGameEnd 
+}: { 
+  initialPlayers: Player[]; 
+  onGoHome: () => void;
+  onGameEnd: (rankings: { name: string; points: number }[]) => void;
+}) {
+  const [gameState, setGameState] = useState<'playing' | 'penalties' | 'won'>('playing');
+  const [players, setPlayers] = useState<Player[]>(() => {
+    const shuffled = [...initialPlayers].sort(() => Math.random() - 0.5);
+    return shuffled.map(p => ({ ...p, footballGoals: 0, history: [] }));
+  });
+  const [nodeNumbers, setNodeNumbers] = useState<Record<FootballNode, number>>(() => {
+    const nums = Array.from({ length: 20 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+    return {
+      goalL: nums[0],
+      posL: nums[1],
+      posTL: nums[2],
+      posBL: nums[3],
+      posC: nums[4],
+      posTR: nums[5],
+      posBR: nums[6],
+      posR: nums[7],
+      goalR: nums[8]
+    };
+  });
+  const [ballPos, setBallPos] = useState<FootballNode>('posC');
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [currentDartIndex, setCurrentDartIndex] = useState(0);
+  const [currentTurnDarts, setCurrentTurnDarts] = useState<string[]>([]);
+  const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
+  const [round, setRound] = useState(1);
+  const [partialHits, setPartialHits] = useState<Record<string, number>>({});
+  const [winner, setWinner] = useState<Player | null>(null);
+  const [penaltyRound, setPenaltyRound] = useState(1);
+  const [penaltyScores, setPenaltyScores] = useState<number[]>([0, 0]);
+  const [showGoalAnimation, setShowGoalAnimation] = useState(false);
+  const [goalText, setGoalText] = useState('GOAL!!!');
+
+  const MAX_ROUNDS = 7;
+
+  const handleScoreInput = (num: number) => {
+    if (gameState === 'won') return;
+
+    const updatedPlayers = [...players];
+    const currentPlayer = updatedPlayers[currentPlayerIndex];
+    const dartLabel = num === 0 ? 'MISS' : multiplier === 2 ? `D${num}` : multiplier === 3 ? `T${num}` : `${num}`;
+    
+    if (gameState === 'playing') {
+      // Normal gameplay
+      const possibleMoves = FOOTBALL_CONNECTIONS[ballPos];
+      const targetMove = possibleMoves.find(m => nodeNumbers[m.target] === num);
+
+      if (targetMove) {
+        if (targetMove.weight === 1 || multiplier > 1) {
+          // Direct move
+          setBallPos(targetMove.target);
+          setPartialHits({});
+          
+          // Check for goal
+          const isGoalR = targetMove.target === 'goalR';
+          const isGoalL = targetMove.target === 'goalL';
+
+          if (isGoalR || isGoalL) {
+            let isOwnGoal = false;
+            let scoringPlayerIdx = currentPlayerIndex;
+
+            if (players.length > 1) {
+              if (isGoalR && currentPlayerIndex === 1) {
+                isOwnGoal = true;
+                scoringPlayerIdx = 0;
+              } else if (isGoalL && currentPlayerIndex === 0) {
+                isOwnGoal = true;
+                scoringPlayerIdx = 1;
+              }
+            }
+
+            // Update score for the scoring player
+            updatedPlayers[scoringPlayerIdx].footballGoals = (updatedPlayers[scoringPlayerIdx].footballGoals || 0) + 1;
+            
+            setGoalText(isOwnGoal ? 'OHH NO - OWN GOAL' : 'GOAL!!!');
+            setShowGoalAnimation(true);
+            
+            setTimeout(() => {
+              setShowGoalAnimation(false);
+              setBallPos('posC');
+            }, 2500);
+          }
+        } else {
+          // Weight 2 move (Single hit)
+          const currentHits = partialHits[targetMove.target] || 0;
+          if (currentHits === 1) {
+            setBallPos(targetMove.target);
+            setPartialHits({});
+          } else {
+            setPartialHits({ [targetMove.target]: 1 });
+          }
+        }
+      }
+    } else if (gameState === 'penalties') {
+      // Penalty Shootout
+      const targetGoal = currentPlayerIndex === 0 ? 'goalR' : 'goalL';
+      if (num === nodeNumbers[targetGoal]) {
+        const newPenaltyScores = [...penaltyScores];
+        newPenaltyScores[currentPlayerIndex]++;
+        setPenaltyScores(newPenaltyScores);
+        currentPlayer.footballGoals = (currentPlayer.footballGoals || 0) + 1;
+      }
+    }
+
+    const newTurnDarts = [...currentTurnDarts, dartLabel];
+    setMultiplier(1);
+
+    if (currentDartIndex < 2) {
+      setCurrentDartIndex(currentDartIndex + 1);
+      setCurrentTurnDarts(newTurnDarts);
+    } else {
+      // End of turn
+      currentPlayer.history.push([]); // Track turns
+      setPlayers(updatedPlayers);
+      setCurrentDartIndex(0);
+      setCurrentTurnDarts([]);
+      
+      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+      if (nextPlayerIdx === 0) {
+        // End of round
+        if (gameState === 'playing') {
+          if (round >= MAX_ROUNDS) {
+            // Check for tie
+            const goals = updatedPlayers.map(p => p.footballGoals || 0);
+            if (goals.length > 1 && goals[0] === goals[1]) {
+              setGameState('penalties');
+            } else {
+              finishGame(updatedPlayers);
+            }
+          } else {
+            setRound(round + 1);
+            setCurrentPlayerIndex(0);
+          }
+        } else if (gameState === 'penalties') {
+          // Check penalty result
+          if (penaltyScores[0] !== penaltyScores[1]) {
+            finishGame(updatedPlayers);
+          } else {
+            setPenaltyRound(penaltyRound + 1);
+            setCurrentPlayerIndex(0);
+          }
+        }
+      } else {
+        setCurrentPlayerIndex(nextPlayerIdx);
+      }
+    }
+  };
+
+  const finishGame = (finalPlayers: Player[]) => {
+    const sorted = [...finalPlayers].sort((a, b) => (b.footballGoals || 0) - (a.footballGoals || 0));
+    setWinner(sorted[0]);
+    setGameState('won');
+    
+    const distinctGoals = Array.from(new Set(finalPlayers.map(p => p.footballGoals || 0))).sort((a, b) => b - a);
+    const rankings = finalPlayers.map(p => {
+      const g = p.footballGoals || 0;
+      const rankIndex = distinctGoals.indexOf(g);
+      let points = 0;
+      if (rankIndex === 0) points = 10;
+      else if (rankIndex === 1) points = 5;
+      else if (rankIndex === 2) points = 2;
+      return { name: p.name, points };
+    });
+    onGameEnd(rankings);
+  };
+
+  const handleUndo = () => {
+    if (currentDartIndex > 0) {
+      setCurrentDartIndex(currentDartIndex - 1);
+      setCurrentTurnDarts(currentTurnDarts.slice(0, -1));
+    }
+  };
+
+  return (
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#051a05]">
+      {/* Left Side: Field Visualization */}
+      <div className="flex-1 relative flex flex-col items-center justify-center p-8 overflow-hidden">
+        {/* Grass Texture Overlay */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        
+        {/* Field Boundary */}
+        <div className="relative w-full max-w-4xl aspect-[1.6/1] border-4 border-white/40 rounded-sm bg-emerald-900/40 shadow-2xl overflow-hidden">
+          {/* Field Markings */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Center Line */}
+            <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-white/30"></div>
+            {/* Center Circle */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-4 border-white/30 rounded-full"></div>
+            {/* Penalty Areas */}
+            <div className="absolute top-1/4 bottom-1/4 left-0 w-32 border-4 border-white/30 border-l-0"></div>
+            <div className="absolute top-1/4 bottom-1/4 right-0 w-32 border-4 border-white/30 border-r-0"></div>
+          </div>
+
+          {/* Connections (Lines) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            {Object.entries(FOOTBALL_CONNECTIONS).map(([fromNode, targets]) => {
+              const from = NODE_POSITIONS[fromNode as FootballNode];
+              return targets.map((t, idx) => {
+                const to = NODE_POSITIONS[t.target];
+                return (
+                  <line 
+                    key={`${fromNode}-${t.target}-${idx}`}
+                    x1={`${from.x}%`} y1={`${from.y}%`}
+                    x2={`${to.x}%`} y2={`${to.y}%`}
+                    stroke="white"
+                    strokeWidth={t.weight === 2 ? "4" : "1"}
+                    strokeOpacity={t.weight === 2 ? "0.4" : "0.2"}
+                    strokeDasharray={t.weight === 2 ? "8,4" : "none"}
+                  />
+                );
+              });
+            })}
+          </svg>
+
+          {/* Nodes (Boxes) */}
+          {Object.entries(NODE_POSITIONS).map(([node, pos]) => {
+            const isBallHere = ballPos === node;
+            const num = nodeNumbers[node as FootballNode];
+            const isPossibleMove = gameState === 'playing' && FOOTBALL_CONNECTIONS[ballPos].some(m => m.target === node);
+            const isPenaltyTarget = gameState === 'penalties' && ((currentPlayerIndex === 0 && node === 'goalR') || (currentPlayerIndex === 1 && node === 'goalL'));
+
+            return (
+              <motion.div
+                key={node}
+                className={`absolute w-16 h-20 -translate-x-1/2 -translate-y-1/2 border-2 flex flex-col items-center justify-center transition-all duration-500 ${
+                  isBallHere 
+                    ? 'bg-white border-white scale-110 z-30 shadow-[0_0_30px_rgba(255,255,255,0.5)]' 
+                    : isPossibleMove || isPenaltyTarget
+                      ? 'bg-emerald-500/20 border-emerald-400 animate-pulse z-20' 
+                      : 'bg-black/40 border-white/20 z-10'
+                }`}
+                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+              >
+                <div className={`text-xs font-mono uppercase tracking-tighter mb-1 ${isBallHere ? 'text-black' : 'text-white/40'}`}>{pos.label}</div>
+                <div className={`text-3xl font-display italic font-black ${isBallHere ? 'text-black' : 'text-white'}`}>{num}</div>
+                {partialHits[node] === 1 && (
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-[10px] font-bold text-black border-2 border-white">1/2</div>
+                )}
+              </motion.div>
+            );
+          })}
+
+          {/* Soccer Ball */}
+          <motion.div
+            animate={{ 
+              left: `${NODE_POSITIONS[ballPos].x}%`, 
+              top: `${NODE_POSITIONS[ballPos].y}%`,
+              rotate: 360
+            }}
+            transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+            className="absolute w-10 h-10 -translate-x-1/2 -translate-y-1/2 z-40 drop-shadow-2xl pointer-events-none"
+          >
+            <div className="w-full h-full bg-white rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
+              <div className="w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-4 h-4 bg-black rotate-45"></div>
+              </div>
+            </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {showGoalAnimation && (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1.2, opacity: 1 }}
+                exit={{ scale: 2, opacity: 0 }}
+                className="absolute inset-0 z-[60] flex items-center justify-center pointer-events-none"
+              >
+                <div className={`text-black px-12 py-6 font-display italic font-black text-7xl md:text-9xl shadow-2xl animate-pulse border-8 border-black transform -rotate-12 ${goalText.includes('OWN') ? 'bg-red-500' : 'bg-yellow-400'}`}>
+                  {goalText}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Game Info Overlay */}
+        <div className="mt-12 flex gap-12 items-center">
+          <div className="text-center">
+            <div className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">Round</div>
+            <div className="text-5xl font-display italic font-black text-white">{gameState === 'penalties' ? 'PENALTIES' : `${round}/${MAX_ROUNDS}`}</div>
+          </div>
+          <div className="flex items-center gap-8 bg-black/40 border-2 border-white/10 p-6 rounded-2xl">
+            {players.map((p, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className={`text-[10px] font-mono uppercase mb-1 ${i === currentPlayerIndex ? 'text-emerald-400' : 'text-zinc-500'}`}>{p.name}</div>
+                <div className="text-4xl font-display italic font-black text-white">{p.footballGoals || 0}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {gameState === 'won' && winner && (
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+          >
+            <Trophy size={120} className="text-yellow-400 mb-8 animate-bounce" />
+            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-emerald-500 mb-4">Match Winner</h2>
+            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <button 
+              onClick={onGoHome}
+              className="bg-emerald-600 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+            >
+              Return Home
+            </button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Right Side: Input Panel */}
+      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-emerald-900">
+        <div className="mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
+            <ArrowLeft size={14} /> Abandon Match
+          </button>
+          
+          <div className="p-6 bg-emerald-600/10 border-2 border-emerald-600 rounded-2xl mb-8">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 mb-2">Active Player</div>
+            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="text-xs font-mono text-zinc-400">Target Goal:</div>
+              <div className="text-3xl font-black text-white font-display">{currentPlayerIndex === 0 ? 'GOAL R' : 'GOAL L'}</div>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            {[0, 1, 2].map(dartIdx => (
+              <div 
+                key={dartIdx}
+                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                  dartIdx < currentDartIndex 
+                    ? 'bg-emerald-600 border-emerald-500 text-black' 
+                    : dartIdx === currentDartIndex 
+                      ? 'border-emerald-500 text-emerald-500 animate-pulse' 
+                      : 'border-zinc-800 text-zinc-800'
+                }`}
+              >
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Multiplier Toggles */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[1, 2, 3].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMultiplier(m as 1 | 2 | 3)}
+              disabled={showGoalAnimation}
+              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
+                multiplier === m 
+                  ? 'bg-emerald-600 border-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
+                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
+              }`}
+            >
+              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
+          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => {
+            const isPossibleMove = gameState === 'playing' && FOOTBALL_CONNECTIONS[ballPos].some(m => nodeNumbers[m.target] === num);
+            const isPenaltyTarget = gameState === 'penalties' && ((currentPlayerIndex === 0 && num === nodeNumbers['goalR']) || (currentPlayerIndex === 1 && num === nodeNumbers['goalL']));
+
+            return (
+              <button
+                key={num}
+                onClick={() => handleScoreInput(num)}
+                disabled={gameState === 'won' || showGoalAnimation}
+                className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
+                  isPossibleMove || isPenaltyTarget
+                    ? 'border-emerald-500 bg-emerald-600/20 text-white hover:bg-emerald-600 hover:text-black'
+                    : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                }`}
+              >
+                <span className="text-2xl font-black font-display italic">{num}</span>
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => handleScoreInput(0)}
+            disabled={gameState === 'won' || showGoalAnimation}
+            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+          >
+            MISS
+          </button>
+        </div>
+
+        <button
+          onClick={handleUndo}
+          disabled={gameState === 'won' || currentDartIndex === 0 || showGoalAnimation}
           className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
         >
           <RotateCcw size={18} />
