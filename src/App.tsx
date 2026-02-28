@@ -2007,47 +2007,72 @@ function GameAsteroids({
               const cx = 80;
               const cy = 80;
 
+              const explosionExit = {
+                scale: [1, 2.5, 0],
+                opacity: [0.8, 1, 0],
+                rotate: [0, 20, 40],
+                filter: ["blur(0px)", "blur(2px)", "blur(8px)"],
+              };
+
               return (
                 <g key={`icons-${num}`}>
-                  {hits < 1 && (
-                    <text 
-                      x={cx + 54 * Math.sin(textAngle)} 
-                      y={cy - 54 * Math.cos(textAngle)} 
-                      fontSize="4.5" 
-                      fill="white" 
-                      opacity="0.8" 
-                      textAnchor="middle" 
-                      dominantBaseline="middle"
-                    >
-                      👽
-                    </text>
-                  )}
-                  {hits < 2 && (
-                    <text 
-                      x={cx + 62 * Math.sin(textAngle)} 
-                      y={cy - 62 * Math.cos(textAngle)} 
-                      fontSize="4.5" 
-                      fill="white" 
-                      opacity="0.8" 
-                      textAnchor="middle" 
-                      dominantBaseline="middle"
-                    >
-                      🚀
-                    </text>
-                  )}
-                  {hits < 3 && (
-                    <text 
-                      x={cx + 70 * Math.sin(textAngle)} 
-                      y={cy - 70 * Math.cos(textAngle)} 
-                      fontSize="4.5" 
-                      fill="white" 
-                      opacity="0.8" 
-                      textAnchor="middle" 
-                      dominantBaseline="middle"
-                    >
-                      🪐
-                    </text>
-                  )}
+                  <AnimatePresence>
+                    {hits < 1 && (
+                      <motion.text 
+                        key={`alien-${num}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.8 }}
+                        exit={explosionExit}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        x={cx + 54 * Math.sin(textAngle)} 
+                        y={cy - 54 * Math.cos(textAngle)} 
+                        fontSize="4.5" 
+                        fill="white" 
+                        textAnchor="middle" 
+                        dominantBaseline="middle"
+                      >
+                        👽
+                      </motion.text>
+                    )}
+                  </AnimatePresence>
+                  <AnimatePresence>
+                    {hits < 2 && (
+                      <motion.text 
+                        key={`ship-${num}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.8 }}
+                        exit={explosionExit}
+                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.05 }}
+                        x={cx + 62 * Math.sin(textAngle)} 
+                        y={cy - 62 * Math.cos(textAngle)} 
+                        fontSize="4.5" 
+                        fill="white" 
+                        textAnchor="middle" 
+                        dominantBaseline="middle"
+                      >
+                        🚀
+                      </motion.text>
+                    )}
+                  </AnimatePresence>
+                  <AnimatePresence>
+                    {hits < 3 && (
+                      <motion.text 
+                        key={`planet-${num}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.8 }}
+                        exit={explosionExit}
+                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                        x={cx + 70 * Math.sin(textAngle)} 
+                        y={cy - 70 * Math.cos(textAngle)} 
+                        fontSize="4.5" 
+                        fill="white" 
+                        textAnchor="middle" 
+                        dominantBaseline="middle"
+                      >
+                        🪐
+                      </motion.text>
+                    )}
+                  </AnimatePresence>
                 </g>
               );
             })}
