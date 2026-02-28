@@ -35,10 +35,8 @@ export default function App() {
   };
 
   const handleResetTournament = () => {
-    if (confirm('Reset all tournament scores and players?')) {
-      setTournamentPlayers([]);
-      setView('home');
-    }
+    setTournamentPlayers([]);
+    setView('home');
   };
 
   return (
@@ -150,7 +148,7 @@ function HomePage({
 
               {players.length > 0 ? (
                 <div className="space-y-3">
-                  {players.sort((a, b) => b.tournamentPoints - a.tournamentPoints).map((p, idx) => (
+                  {[...players].sort((a, b) => b.tournamentPoints - a.tournamentPoints).map((p, idx) => (
                     <div key={idx} className="flex items-center justify-between p-4 bg-black/40 border border-zinc-800 group hover:border-green-500/50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className={`w-8 h-8 flex items-center justify-center font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
@@ -164,7 +162,7 @@ function HomePage({
                           <div className="text-2xl font-black text-green-500">{p.tournamentPoints}</div>
                         </div>
                         <button 
-                          onClick={() => setPlayers(players.filter((_, i) => i !== players.indexOf(p)))}
+                          onClick={() => setPlayers(players.filter(player => player.name !== p.name))}
                           className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 p-2 transition-all"
                         >
                           &times;
@@ -217,12 +215,12 @@ function HomePage({
             <button
               onClick={() => onSelectGame('moon')}
               disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-blue-600 p-8 hover:bg-blue-600 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.1)] disabled:opacity-20 disabled:grayscale"
+              className="w-full group relative bg-zinc-900 border-2 border-yellow-500 p-8 hover:bg-yellow-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.1)] disabled:opacity-20 disabled:grayscale"
             >
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-blue-500 group-hover:text-white transition-colors" />
-                  <span className="bg-blue-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+                  <Target size={32} className="text-yellow-500 group-hover:text-white transition-colors" />
+                  <span className="bg-yellow-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
                 </div>
                 <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">TO THE MOON</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Race to the lunar surface.</p>
@@ -232,12 +230,12 @@ function HomePage({
             <button
               onClick={() => onSelectGame('around')}
               disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-green-600 p-8 hover:bg-green-600 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(22,163,74,0.1)] disabled:opacity-20 disabled:grayscale"
+              className="w-full group relative bg-zinc-900 border-2 border-blue-600 p-8 hover:bg-blue-600 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.1)] disabled:opacity-20 disabled:grayscale"
             >
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-green-500 group-hover:text-white transition-colors" />
-                  <span className="bg-green-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+                  <Target size={32} className="text-blue-500 group-hover:text-white transition-colors" />
+                  <span className="bg-blue-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
                 </div>
                 <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">AROUND THE WORLD</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Hit 1-20 in order. 7 rounds to finish.</p>
@@ -381,90 +379,75 @@ function Game301({
   const currentPlayer = players[currentPlayerIndex];
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden wood-texture">
-      {/* Left Side: Scoreboard (Chalkboard Style) */}
-      <div className="flex-1 chalkboard border-r-8 border-[#2c1b0e] flex flex-col overflow-hidden relative border-l-8 border-l-[#2c1b0e]">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center relative z-10">
-          <button onClick={onGoHome} className="p-3 bg-white/5 hover:bg-white/20 rounded-full transition-colors text-white">
-            <Home size={24} />
-          </button>
-          <div className="font-mono text-sm uppercase tracking-[0.3em] text-white/60 chalk-text">
-            301 DOWN <span className="mx-2 text-red-500">•</span> ROUND {Math.floor(players[0].history.length + 1)}
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#050505]">
+      {/* Left Side: Scoreboard */}
+      <div className="flex-1 relative overflow-hidden flex flex-col border-r-8 border-[#1a1a1a]">
+        <div className="p-8 border-b border-white/5 flex justify-center items-center relative z-10">
+          <div className="text-center">
+            <div className="text-xs font-mono uppercase tracking-[0.5em] text-red-500 mb-1">Championship Series</div>
+            <h2 className="text-4xl font-display italic font-black text-white">301 DOWN <span className="text-red-500">•</span> ROUND {Math.floor(players[0].history.length + 1)}</h2>
           </div>
-          <button onClick={() => {
-            if(confirm('Restart game?')) {
-              setPlayers(initialPlayers.map(p => ({ ...p, score: 301, history: [] })));
-              setCurrentPlayerIndex(0);
-              setCurrentDartIndex(0);
-              setCurrentTurnDarts([]);
-              setWinner(null);
-              setGameState('playing');
-              setHasFinished(false);
-            }
-          }} className="p-3 bg-white/5 hover:bg-white/20 rounded-full transition-colors text-white">
-            <RotateCcw size={20} />
-          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10 content-start">
+        <div className="flex-1 overflow-y-auto p-12 grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 content-start">
           {players.map((p, idx) => (
             <motion.div 
               key={idx} 
               initial={false}
               animate={{ 
                 scale: idx === currentPlayerIndex ? 1.02 : 1,
-                opacity: idx === currentPlayerIndex ? 1 : 0.6
+                opacity: idx === currentPlayerIndex ? 1 : 0.5
               }}
-              className={`p-6 border-4 ${idx === currentPlayerIndex ? 'border-green-500 shadow-[0_0_30px_rgba(74,222,128,0.2)]' : 'border-white/10'} bg-black/40 backdrop-blur-sm relative overflow-hidden h-fit`}
+              className={`p-8 border-2 transition-all duration-500 ${idx === currentPlayerIndex ? 'border-red-600 bg-red-600/5 shadow-[0_0_40px_rgba(220,38,38,0.15)]' : 'border-white/5 bg-black/40'} relative overflow-hidden h-fit rounded-2xl`}
             >
               {idx === currentPlayerIndex && (
-                <div className="absolute top-0 right-0 bg-green-500 text-black font-mono text-[10px] px-3 py-1 font-bold uppercase tracking-tighter">
+                <div className="absolute top-0 right-0 bg-red-600 text-white font-mono text-[10px] px-4 py-1 font-bold uppercase tracking-widest">
                   Active
                 </div>
               )}
               
               {p.score <= 0 && (
-                <div className="absolute top-0 left-0 bg-red-600 text-white font-mono text-[10px] px-3 py-1 font-bold uppercase tracking-tighter">
+                <div className="absolute top-0 left-0 bg-green-600 text-white font-mono text-[10px] px-4 py-1 font-bold uppercase tracking-widest">
                   Finished
                 </div>
               )}
               
-              <div className="flex justify-between items-end mb-2">
-                <h3 className="text-xl font-serif font-black uppercase text-white chalk-text truncate pr-4">{p.name}</h3>
-                <div className="font-mono text-xs text-white/40">#{idx + 1}</div>
+              <div className="flex justify-between items-end mb-4">
+                <h3 className="text-2xl font-display italic font-black uppercase text-white truncate pr-4">{p.name}</h3>
+                <div className="font-mono text-xs text-zinc-600">PLAYER {idx + 1}</div>
               </div>
               
-              <div className="text-5xl font-black tracking-tighter leading-none mb-4 text-white chalk-text">
+              <div className="text-7xl font-display italic font-black tracking-tighter leading-none mb-8 text-white">
                 {p.score}
               </div>
 
-              {/* History of last 3 turns (reduced for space) */}
-              <div className="mt-4 space-y-1">
-                <div className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 mb-1 border-b border-white/10 pb-1">Recent Turns</div>
+              {/* History of last 3 turns */}
+              <div className="space-y-2">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2 border-b border-white/5 pb-2">Recent Performance</div>
                 {p.history.slice(-3).reverse().map((turn, tIdx) => (
-                  <div key={tIdx} className="flex justify-between items-center text-sm font-mono text-white/80 chalk-text">
-                    <span className="opacity-30 text-[10px]">T{p.history.length - tIdx}</span>
-                    <div className="flex gap-2">
+                  <div key={tIdx} className="flex justify-between items-center text-sm font-mono text-zinc-400">
+                    <span className="opacity-40 text-[10px]">TURN {p.history.length - tIdx}</span>
+                    <div className="flex gap-3">
                       {turn.map((d, dIdx) => (
-                        <span key={dIdx} className={`w-8 text-center ${d > 20 ? 'text-red-400' : 'text-white'}`}>{d}</span>
+                        <span key={dIdx} className={`w-10 text-center font-bold ${d > 20 ? 'text-red-500' : 'text-white'}`}>{d}</span>
                       ))}
                     </div>
-                    <span className="font-bold text-green-400 w-10 text-right">{turn.reduce((a, b) => a + b, 0)}</span>
+                    <span className="font-black text-white w-12 text-right">-{turn.reduce((a, b) => a + b, 0)}</span>
                   </div>
                 ))}
               </div>
 
               {idx === currentPlayerIndex && gameState === 'playing' && (
-                <div className="mt-8 flex gap-4">
+                <div className="mt-10 flex gap-4">
                   {[0, 1, 2].map(dartIdx => (
                     <div 
                       key={dartIdx}
-                      className={`flex-1 h-16 border-2 flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                      className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
                         dartIdx < currentDartIndex 
-                          ? 'bg-white text-black border-white' 
+                          ? 'bg-red-600 border-red-500 text-white' 
                           : dartIdx === currentDartIndex 
-                            ? 'border-green-500 text-green-500 animate-pulse bg-green-500/10' 
-                            : 'border-white/10 text-white/10'
+                            ? 'border-red-500 text-red-500 animate-pulse bg-red-500/5' 
+                            : 'border-zinc-800 text-zinc-800'
                       }`}
                     >
                       {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
@@ -476,89 +459,106 @@ function Game301({
           ))}
         </div>
 
+        {/* Win Overlay */}
         {gameState === 'won' && winner && (
           <motion.div 
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            className="p-10 bg-green-600 text-white relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-2xl flex flex-col items-center justify-center p-12 text-center"
           >
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 rounded-full">
-                <Trophy size={64} className="text-yellow-300 drop-shadow-lg" />
-              </div>
-              <div>
-                <div className="text-sm font-mono uppercase tracking-[0.4em] text-white/70 mb-1">Champion</div>
-                <div className="text-6xl font-display italic font-black uppercase tracking-tight">{winner.name}</div>
-              </div>
-            </div>
+            <Trophy size={120} className="text-yellow-400 mb-8 drop-shadow-[0_0_40px_rgba(234,179,8,0.4)]" />
+            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-red-500 mb-4">Championship Winner</h2>
+            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <button 
+              onClick={onGoHome}
+              className="bg-red-600 text-white px-16 py-5 font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-[0_0_30px_rgba(220,38,38,0.3)]"
+            >
+              Return to Base
+            </button>
           </motion.div>
         )}
       </div>
 
       {/* Right Side: Input Panel */}
-      <div className="w-full md:w-[520px] bg-zinc-950 text-white p-6 flex flex-col shadow-2xl relative border-r-8 border-r-[#2c1b0e]">
-        
-        {/* Undo Button - Moved to Top for Visibility */}
-        <div className="mb-6">
-          <button
-            onClick={handleUndo}
-            disabled={gameState !== 'playing' || (currentDartIndex === 0 && players.every(p => p.history.length === 0))}
-            className="w-full py-4 flex items-center justify-center gap-4 border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-lg italic font-display shadow-[0_0_15px_rgba(220,38,38,0.2)]"
-          >
-            <RotateCcw size={20} />
-            UNDO LAST SHOT
+      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-[#1a1a1a]">
+        <div className="mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
+            <ArrowLeft size={14} /> Abort Mission
           </button>
-        </div>
+          
+          <div className="p-6 bg-red-600/10 border-2 border-red-600 rounded-2xl mb-8">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-red-400 mb-2">Active Player</div>
+            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="text-xs font-mono text-zinc-400">Current Score:</div>
+              <div className="text-3xl font-black text-white font-display">{players[currentPlayerIndex].score}</div>
+            </div>
+          </div>
 
-        <div className="mb-8">
-          <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500 mb-4">Power Multiplier</div>
-          <div className="grid grid-cols-3 gap-3">
-            {[1, 2, 3].map(m => (
-              <button
-                key={m}
-                onClick={() => setMultiplier(m as 1 | 2 | 3)}
-                className={`py-6 font-mono text-xl font-bold border-2 transition-all duration-300 ${
-                  multiplier === m 
-                    ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' 
-                    : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+          <div className="flex gap-4">
+            {[0, 1, 2].map(dartIdx => (
+              <div 
+                key={dartIdx}
+                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                  dartIdx < currentDartIndex 
+                    ? 'bg-red-600 border-red-500 text-white' 
+                    : dartIdx === currentDartIndex 
+                      ? 'border-red-500 text-red-500 animate-pulse' 
+                      : 'border-zinc-800 text-zinc-800'
                 }`}
               >
-                {m === 1 ? 'X1' : m === 2 ? 'X2' : 'X3'}
-                <div className="text-[10px] mt-1 opacity-60">{m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}</div>
-              </button>
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+              </div>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-10">
+        {/* Multiplier Toggles */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[1, 2, 3].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMultiplier(m as 1 | 2 | 3)}
+              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
+                multiplier === m 
+                  ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]' 
+                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
+              }`}
+            >
+              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
           {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
             <button
               key={num}
               onClick={() => handleScoreInput(num)}
               disabled={gameState !== 'playing'}
-              className="aspect-square flex items-center justify-center text-3xl font-black font-serif italic border-2 border-zinc-800 hover:bg-white hover:text-black hover:border-white disabled:opacity-10 transition-all active:scale-95"
+              className="aspect-square flex flex-col items-center justify-center border-2 border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300 transition-all active:scale-95 disabled:opacity-10"
             >
-              {num}
+              <span className="text-2xl font-black font-display italic">{num}</span>
             </button>
           ))}
           
-          {/* Special Buttons Row 1 */}
           <button
             onClick={() => handleScoreInput(0)}
             disabled={gameState !== 'playing'}
-            className="col-span-2 py-6 text-2xl font-black font-serif italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-700 disabled:opacity-10 transition-all active:scale-95"
+            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
           >
             MISS
           </button>
+
           <button
             onClick={() => {
               setMultiplier(1);
               handleScoreInput(25);
             }}
             disabled={gameState !== 'playing'}
-            className="col-span-1 py-6 text-xs font-mono font-bold uppercase border-2 border-green-600 bg-green-600/10 hover:bg-green-600 transition-all active:scale-95"
+            className="col-span-2 py-4 text-xs font-mono font-bold uppercase border-2 border-zinc-800 hover:border-red-500 hover:text-red-500 transition-all active:scale-95"
           >
-            OUTER<br/>BULL
+            Outer Bull (25)
           </button>
           <button
             onClick={() => {
@@ -566,19 +566,27 @@ function Game301({
               handleScoreInput(50);
             }}
             disabled={gameState !== 'playing'}
-            className="col-span-1 py-6 text-xs font-mono font-bold uppercase border-2 border-red-600 bg-red-600/10 hover:bg-red-600 transition-all active:scale-95"
+            className="col-span-2 py-4 text-xs font-mono font-bold uppercase border-2 border-zinc-800 hover:border-red-500 hover:text-red-500 transition-all active:scale-95"
           >
-            INNER<br/>BULL
+            Inner Bull (50)
           </button>
         </div>
 
-        <div className="mt-auto pt-8 border-t border-zinc-800 flex justify-between items-center opacity-30">
-          <div className="flex gap-4">
-            <div className="w-4 h-4 rounded-full bg-red-600"></div>
-            <div className="w-4 h-4 rounded-full bg-green-600"></div>
-            <div className="w-4 h-4 rounded-full bg-white"></div>
+        <button
+          onClick={handleUndo}
+          disabled={gameState !== 'playing' || (currentDartIndex === 0 && players.every(p => p.history.length === 0))}
+          className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
+        >
+          <RotateCcw size={18} />
+          UNDO LAST DART
+        </button>
+
+        <div className="mt-auto pt-8 border-t border-zinc-900 flex justify-between items-center opacity-20">
+          <div className="font-mono text-[8px] uppercase tracking-widest">DartMaster Championship</div>
+          <div className="flex gap-2">
+            <div className="w-2 h-2 rounded-full bg-red-600"></div>
+            <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-widest">DartMaster v2.0</div>
         </div>
       </div>
     </div>
@@ -703,8 +711,8 @@ function GameMoon({
 
         {/* Moon (Top) */}
         <div className="relative z-20 text-center mb-8">
-          <div className="text-xs font-mono uppercase tracking-[0.5em] text-blue-400 mb-2">Lunar Mission</div>
-          <h2 className="text-5xl font-display italic font-black text-white">ROUND {round}<span className="text-blue-400">/{MAX_ROUNDS}</span></h2>
+          <div className="text-xs font-mono uppercase tracking-[0.5em] text-yellow-400 mb-2">Lunar Mission</div>
+          <h2 className="text-5xl font-display italic font-black text-white">ROUND {round}<span className="text-yellow-400">/{MAX_ROUNDS}</span></h2>
         </div>
 
         <motion.div 
@@ -734,11 +742,11 @@ function GameMoon({
                 animate={{ 
                   bottom: `${(p.moonSteps || 0) * 10}%`,
                   scale: idx === currentPlayerIndex ? 1.2 : 1,
-                  filter: idx === currentPlayerIndex ? 'drop-shadow(0 0 15px #3b82f6)' : 'none'
+                  filter: idx === currentPlayerIndex ? 'drop-shadow(0 0 15px #eab308)' : 'none'
                 }}
                 className="relative z-20 mb-4"
               >
-                <div className={`p-4 rounded-xl ${idx === currentPlayerIndex ? 'bg-blue-600' : 'bg-zinc-800'} text-white shadow-xl`}>
+                <div className={`p-4 rounded-xl ${idx === currentPlayerIndex ? 'bg-yellow-500' : 'bg-zinc-800'} text-white shadow-xl`}>
                   <Target size={32} className={idx === currentPlayerIndex ? 'animate-pulse' : ''} />
                 </div>
                 {/* Flame effect */}
@@ -753,7 +761,7 @@ function GameMoon({
 
               {/* Player Info */}
               <div className="text-center mt-4">
-                <div className={`text-xs font-mono uppercase tracking-tighter mb-1 ${idx === currentPlayerIndex ? 'text-blue-400 font-bold' : 'text-zinc-500'}`}>
+                <div className={`text-xs font-mono uppercase tracking-tighter mb-1 ${idx === currentPlayerIndex ? 'text-yellow-400 font-bold' : 'text-zinc-500'}`}>
                   {p.name}
                 </div>
                 <div className="text-2xl font-black font-display italic text-white">
@@ -768,7 +776,7 @@ function GameMoon({
         </div>
 
         {/* Earth (Bottom) */}
-        <div className="relative z-10 w-full h-32 bg-blue-900 rounded-t-[100%] shadow-[0_-20px_100px_rgba(37,99,235,0.3)] flex items-center justify-center overflow-hidden border-t-4 border-blue-400/30">
+        <div className="relative z-10 w-full h-32 bg-yellow-900/20 rounded-t-[100%] shadow-[0_-20px_100px_rgba(234,179,8,0.3)] flex items-center justify-center overflow-hidden border-t-4 border-yellow-400/30">
           <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
           <div className="text-white/20 font-black text-6xl italic font-display tracking-widest uppercase">EARTH</div>
         </div>
@@ -781,11 +789,11 @@ function GameMoon({
             className="absolute inset-0 z-50 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
           >
             <Trophy size={120} className="text-yellow-400 mb-8 drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-blue-400 mb-4">Mission Accomplished</h2>
+            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-yellow-400 mb-4">Mission Accomplished</h2>
             <h3 className="text-7xl font-display italic font-black text-white mb-12">{winner.name} Reached the Moon!</h3>
             <button 
               onClick={onGoHome}
-              className="bg-white text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all"
+              className="bg-white text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-white transition-all"
             >
               Return to Base
             </button>
@@ -800,8 +808,8 @@ function GameMoon({
             <ArrowLeft size={14} /> Abort Mission
           </button>
           
-          <div className="p-6 bg-blue-600/10 border-2 border-blue-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-2">Current Pilot</div>
+          <div className="p-6 bg-yellow-600/10 border-2 border-yellow-600 rounded-2xl mb-8">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-yellow-400 mb-2">Current Pilot</div>
             <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
             <div className="flex items-center gap-4 mt-4">
               <div className="text-xs font-mono text-zinc-400">Target Number:</div>
@@ -815,9 +823,9 @@ function GameMoon({
                 key={dartIdx}
                 className={`flex-1 h-12 border-2 rounded-lg flex items-center justify-center font-mono text-lg font-bold transition-all ${
                   dartIdx < currentDartIndex 
-                    ? 'bg-blue-600 border-blue-500 text-white' 
+                    ? 'bg-yellow-600 border-yellow-500 text-white' 
                     : dartIdx === currentDartIndex 
-                      ? 'border-blue-500 text-blue-500 animate-pulse' 
+                      ? 'border-yellow-500 text-yellow-500 animate-pulse' 
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
@@ -836,7 +844,7 @@ function GameMoon({
               className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
                 players.some(p => p.targetNumber === num)
                   ? num === players[currentPlayerIndex].targetNumber
-                    ? 'border-blue-500 bg-blue-600/20 text-white hover:bg-blue-600'
+                    ? 'border-yellow-500 bg-yellow-600/20 text-white hover:bg-yellow-600'
                     : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
               }`}
@@ -871,7 +879,7 @@ function GameMoon({
         <div className="mt-auto pt-8 border-t border-zinc-900 flex justify-between items-center opacity-20">
           <div className="font-mono text-[8px] uppercase tracking-widest">Lunar Mission Control</div>
           <div className="flex gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-600"></div>
             <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
           </div>
         </div>
@@ -988,10 +996,10 @@ function GameAround({
       <div className="flex-1 relative flex flex-col items-center justify-center p-12 overflow-hidden">
         {/* Background Globe Effect */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-green-500/20"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-green-500/10"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-green-500/10 rotate-45"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-green-500/10 -rotate-45"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-blue-500/20"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-blue-500/10"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-blue-500/10 rotate-45"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-blue-500/10 -rotate-45"></div>
         </div>
 
         <div className="relative z-10 text-center mb-12">
