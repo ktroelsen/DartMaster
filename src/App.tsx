@@ -4,20 +4,22 @@
  */
 
 import React, { useState } from 'react';
-import { Home, Trophy, User, RotateCcw, ArrowLeft, Target, ChevronRight } from 'lucide-react';
+import { Home, Trophy, User, RotateCcw, ArrowLeft, Target, ChevronRight, Rocket, Ghost, Orbit } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type View = 'home' | '301' | 'moon' | 'around' | 'football';
+type View = 'home' | '301' | 'moon' | 'around' | 'football' | 'asteroids';
 
 interface Player {
   name: string;
   score: number;
-  history: number[][];
+  history: any[][];
   tournamentPoints: number;
   targetNumber?: number;
   moonSteps?: number;
   aroundNumber?: number;
   footballGoals?: number;
+  asteroidsHits?: Record<number, number>;
+  asteroidsScore?: number;
 }
 
 export default function App() {
@@ -67,6 +69,12 @@ export default function App() {
             onGoHome={() => setView('home')}
             onGameEnd={handleUpdateTournamentPoints}
           />
+        ) : view === 'asteroids' ? (
+          <GameAsteroids
+            initialPlayers={tournamentPlayers}
+            onGoHome={() => setView('home')}
+            onGameEnd={handleUpdateTournamentPoints}
+          />
         ) : (
           <GameFootball
             initialPlayers={tournamentPlayers}
@@ -87,7 +95,7 @@ function HomePage({
 }: { 
   players: Player[]; 
   setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
-  onSelectGame: (game: '301' | 'moon' | 'around' | 'football') => void;
+  onSelectGame: (game: '301' | 'moon' | 'around' | 'football' | 'asteroids') => void;
   onReset: () => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -254,6 +262,21 @@ function HomePage({
                 </div>
                 <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">FOOTBALL</h2>
                 <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Pass the ball and score goals. 7 rounds of action.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => onSelectGame('asteroids')}
+              disabled={players.length < 1}
+              className="w-full group relative bg-zinc-900 border-2 border-zinc-500 p-8 hover:bg-zinc-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(113,113,122,0.1)] disabled:opacity-20 disabled:grayscale"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-8">
+                  <Target size={32} className="text-zinc-500 group-hover:text-white transition-colors" />
+                  <span className="bg-zinc-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">ASTEROIDS</h2>
+                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">4 rounds. Hit numbers to clear space debris.</p>
               </div>
             </button>
           </div>
@@ -1645,6 +1668,423 @@ function GameFootball({
         <button
           onClick={handleUndo}
           disabled={gameState === 'won' || currentDartIndex === 0 || showGoalAnimation}
+          className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
+        >
+          <RotateCcw size={18} />
+          UNDO LAST DART
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function GameAsteroids({ 
+  initialPlayers, 
+  onGoHome, 
+  onGameEnd 
+}: { 
+  initialPlayers: Player[]; 
+  onGoHome: () => void;
+  onGameEnd: (rankings: { name: string; points: number }[]) => void;
+}) {
+  const [gameState, setGameState] = useState<'playing' | 'won'>('playing');
+  const [players, setPlayers] = useState<Player[]>(() => {
+    const shuffled = [...initialPlayers].sort(() => Math.random() - 0.5);
+    return shuffled.map(p => ({ 
+      ...p, 
+      asteroidsHits: {}, 
+      asteroidsScore: 0,
+      history: [] 
+    }));
+  });
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [currentDartIndex, setCurrentDartIndex] = useState(0);
+  const [currentTurnDarts, setCurrentTurnDarts] = useState<string[]>([]);
+  const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
+  const [winner, setWinner] = useState<Player | null>(null);
+  const [round, setRound] = useState(1);
+  const [bullseyeActive, setBullseyeActive] = useState(false);
+  const MAX_ROUNDS = 4;
+
+  const dartboardNumbers = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+  
+  const getAdjacent = (num: number) => {
+    const idx = dartboardNumbers.indexOf(num);
+    if (idx === -1) return [];
+    const prev = dartboardNumbers[(idx - 1 + 20) % 20];
+    const next = dartboardNumbers[(idx + 1) % 20];
+    return [prev, next];
+  };
+
+  const calculatePoints = (num: number, hitsToAdd: number, playerHits: Record<number, number>) => {
+    let points = 0;
+    let currentHits = playerHits[num] || 0;
+    
+    for (let i = 0; i < hitsToAdd; i++) {
+      if (currentHits === 0) {
+        points += 1;
+        currentHits++;
+      } else if (currentHits === 1) {
+        points += 3;
+        currentHits++;
+      } else if (currentHits === 2) {
+        points += 5;
+        currentHits++;
+      } else {
+        break;
+      }
+    }
+    return { points, newHits: currentHits };
+  };
+
+  const handleScoreInput = (num: number) => {
+    if (gameState !== 'playing') return;
+
+    const updatedPlayers = [...players];
+    const currentPlayer = updatedPlayers[currentPlayerIndex];
+    const playerHits = { ...(currentPlayer.asteroidsHits || {}) };
+    let totalPointsGained = 0;
+    let dartLabel = num === 0 ? 'MISS' : (multiplier === 2 ? `D${num}` : multiplier === 3 ? `T${num}` : `${num}`);
+
+    if (num === 25 || num === 50) {
+      setBullseyeActive(true);
+      dartLabel = num === 50 ? 'BULL' : 'OUTER';
+    } else if (num !== 0) {
+      const targets = bullseyeActive ? [num, ...getAdjacent(num)] : [num];
+      
+      targets.forEach(targetNum => {
+        const { points, newHits } = calculatePoints(targetNum, multiplier, playerHits);
+        totalPointsGained += points;
+        playerHits[targetNum] = newHits;
+      });
+      
+      if (bullseyeActive) setBullseyeActive(false);
+    }
+
+    if (round === MAX_ROUNDS) {
+      totalPointsGained *= 2;
+    }
+
+    currentPlayer.asteroidsScore = (currentPlayer.asteroidsScore || 0) + totalPointsGained;
+    currentPlayer.asteroidsHits = playerHits;
+
+    const newTurnDarts = [...currentTurnDarts, dartLabel];
+    setMultiplier(1);
+
+    if (currentDartIndex < 2) {
+      setCurrentDartIndex(currentDartIndex + 1);
+      setCurrentTurnDarts(newTurnDarts);
+    } else {
+      currentPlayer.history.push(newTurnDarts);
+      setPlayers(updatedPlayers);
+      setCurrentDartIndex(0);
+      setCurrentTurnDarts([]);
+      
+      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+      if (nextPlayerIdx === 0) {
+        if (round >= MAX_ROUNDS) {
+          const sortedByScore = [...updatedPlayers].sort((a, b) => (b.asteroidsScore || 0) - (a.asteroidsScore || 0));
+          setWinner(sortedByScore[0]);
+          setGameState('won');
+          
+          const distinctScores = Array.from(new Set(updatedPlayers.map(p => p.asteroidsScore || 0))).sort((a, b) => b - a);
+          const rankings = updatedPlayers.map(p => {
+            const score = p.asteroidsScore || 0;
+            const rankIndex = distinctScores.indexOf(score);
+            let points = 0;
+            if (rankIndex === 0) points = 10;
+            else if (rankIndex === 1) points = 5;
+            else if (rankIndex === 2) points = 2;
+            return { name: p.name, points };
+          });
+          onGameEnd(rankings);
+        } else {
+          setRound(round + 1);
+          setCurrentPlayerIndex(0);
+        }
+      } else {
+        setCurrentPlayerIndex(nextPlayerIdx);
+      }
+    }
+  };
+
+  const handleUndo = () => {
+    if (currentDartIndex > 0) {
+      setCurrentDartIndex(currentDartIndex - 1);
+      setCurrentTurnDarts(currentTurnDarts.slice(0, -1));
+    }
+  };
+
+  return (
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#0a0a0a]">
+      {/* Left Side: Visualization */}
+      <div className="flex-1 relative flex flex-col items-center justify-center p-12 overflow-hidden">
+        {/* Background Stars */}
+        <div className="absolute inset-0 opacity-20">
+          {Array.from({ length: 100 }).map((_, i) => (
+            <div 
+              key={i} 
+              className="absolute bg-white rounded-full"
+              style={{
+                width: Math.random() * 2 + 'px',
+                height: Math.random() * 2 + 'px',
+                top: Math.random() * 100 + '%',
+                left: Math.random() * 100 + '%',
+                opacity: Math.random()
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 text-center mb-8">
+          <div className="text-xs font-mono uppercase tracking-[0.5em] text-zinc-500 mb-2">Asteroid Belt</div>
+          <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-zinc-500">/{MAX_ROUNDS}</span></h2>
+          <div className="mt-4 flex items-center justify-center gap-6 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+            <span className="flex items-center gap-2">👽 <span className="text-zinc-500">=</span> 1P</span>
+            <span className="flex items-center gap-2">🚀 <span className="text-zinc-500">=</span> 3P</span>
+            <span className="flex items-center gap-2">🪐 <span className="text-zinc-500">=</span> 5P</span>
+          </div>
+          {round === MAX_ROUNDS && (
+            <div className="mt-2 text-yellow-500 font-mono text-xs animate-pulse uppercase tracking-widest font-bold">DOUBLE POINTS ROUND</div>
+          )}
+        </div>
+
+        {/* The Asteroid / Dartboard */}
+        <div className="relative w-[400px] h-[400px] md:w-[550px] md:h-[550px]">
+          {/* Asteroid Sphere */}
+          <div className="absolute inset-0 rounded-full bg-zinc-900 border-4 border-zinc-800 shadow-[0_0_100px_rgba(255,255,255,0.05)] overflow-hidden">
+            {/* Craters (Abstract) */}
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full opacity-30">
+              <circle cx="30" cy="30" r="10" fill="#333" />
+              <circle cx="70" cy="40" r="15" fill="#333" />
+              <circle cx="40" cy="70" r="8" fill="#333" />
+              <circle cx="80" cy="80" r="12" fill="#333" />
+              <path d="M10,50 Q30,40 50,50 T90,50" fill="none" stroke="#222" strokeWidth="0.5" />
+            </svg>
+
+            {/* Dartboard Segments */}
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full -rotate-9">
+              {dartboardNumbers.map((num, i) => {
+                const angle = i * 18;
+                const hits = players[currentPlayerIndex].asteroidsHits?.[num] || 0;
+                
+                // Calculate text position
+                const textAngle = (angle + 9) * (Math.PI / 180);
+                const tx = 50 + 42 * Math.sin(textAngle);
+                const ty = 50 - 42 * Math.cos(textAngle);
+
+                return (
+                  <g key={num}>
+                    <path
+                      d="M 50 50 L 50 0 A 50 50 0 0 1 65.45 2.45 Z"
+                      transform={`rotate(${angle} 50 50)`}
+                      className={`transition-all duration-500 ${hits >= 3 ? 'fill-zinc-800 opacity-20' : 'fill-transparent stroke-white/5 stroke-[0.1]'}`}
+                    />
+                    <text 
+                      x={tx} 
+                      y={ty} 
+                      fontSize="3.5" 
+                      fill="white" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle" 
+                      className={`font-mono font-bold select-none pointer-events-none ${hits >= 3 ? 'opacity-10' : 'opacity-40'}`}
+                      transform={`rotate(${9} ${tx} ${ty})`}
+                    >
+                      {num}
+                    </text>
+                  </g>
+                );
+              })}
+              <circle cx="50" cy="50" r="8" className={`fill-black/40 stroke-zinc-700 stroke-1 ${bullseyeActive ? 'stroke-yellow-500 animate-pulse' : ''}`} />
+            </svg>
+          </div>
+
+          {/* Icons Layer (Outside the overflow-hidden asteroid) */}
+          <svg viewBox="0 0 160 160" className="absolute -inset-[30%] w-[160%] h-[160%] pointer-events-none -rotate-9">
+            {dartboardNumbers.map((num, i) => {
+              const angle = i * 18;
+              const hits = players[currentPlayerIndex].asteroidsHits?.[num] || 0;
+              const textAngle = (angle + 9) * (Math.PI / 180);
+              
+              const cx = 80;
+              const cy = 80;
+
+              return (
+                <g key={`icons-${num}`}>
+                  {hits < 1 && (
+                    <text 
+                      x={cx + 54 * Math.sin(textAngle)} 
+                      y={cy - 54 * Math.cos(textAngle)} 
+                      fontSize="4.5" 
+                      fill="white" 
+                      opacity="0.8" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle"
+                    >
+                      👽
+                    </text>
+                  )}
+                  {hits < 2 && (
+                    <text 
+                      x={cx + 62 * Math.sin(textAngle)} 
+                      y={cy - 62 * Math.cos(textAngle)} 
+                      fontSize="4.5" 
+                      fill="white" 
+                      opacity="0.8" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle"
+                    >
+                      🚀
+                    </text>
+                  )}
+                  {hits < 3 && (
+                    <text 
+                      x={cx + 70 * Math.sin(textAngle)} 
+                      y={cy - 70 * Math.cos(textAngle)} 
+                      fontSize="4.5" 
+                      fill="white" 
+                      opacity="0.8" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle"
+                    >
+                      🪐
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Bullseye Indicator */}
+          {bullseyeActive && (
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-yellow-500 text-black font-mono text-xs px-4 py-1 font-bold uppercase tracking-widest shadow-lg animate-bounce">
+              BULLSEYE ACTIVE: SPLASH DAMAGE
+            </div>
+          )}
+        </div>
+
+        {/* Player List / Scores */}
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+          {players.map((p, i) => (
+            <div 
+              key={i} 
+              className={`p-4 border-2 transition-all rounded-xl ${i === currentPlayerIndex ? 'border-zinc-400 bg-zinc-400/10' : 'border-zinc-800 bg-black/40'}`}
+            >
+              <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{p.name}</div>
+              <div className="flex justify-between items-end">
+                <div className="text-3xl font-display italic font-black text-white">{p.asteroidsScore || 0}</div>
+                <div className="text-[10px] font-mono text-zinc-600">PTS</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {gameState === 'won' && winner && (
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+          >
+            <Trophy size={120} className="text-yellow-400 mb-8" />
+            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-zinc-500 mb-4">Asteroid Ace</h2>
+            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <button 
+              onClick={onGoHome}
+              className="bg-zinc-100 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+            >
+              Return Home
+            </button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Right Side: Input Panel */}
+      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-zinc-900">
+        <div className="mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
+            <ArrowLeft size={14} /> Abandon Mission
+          </button>
+          
+          <div className="p-6 bg-zinc-600/10 border-2 border-zinc-600 rounded-2xl mb-8">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-2">Current Pilot</div>
+            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="text-xs font-mono text-zinc-500">Total Score:</div>
+              <div className="text-3xl font-black text-white font-display">{players[currentPlayerIndex].asteroidsScore || 0}</div>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            {[0, 1, 2].map(dartIdx => (
+              <div 
+                key={dartIdx}
+                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                  dartIdx < currentDartIndex 
+                    ? 'bg-zinc-600 border-zinc-500 text-black' 
+                    : dartIdx === currentDartIndex 
+                      ? 'border-zinc-500 text-zinc-500 animate-pulse' 
+                      : 'border-zinc-800 text-zinc-800'
+                }`}
+              >
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Multiplier Toggles */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[1, 2, 3].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMultiplier(m as 1 | 2 | 3)}
+              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
+                multiplier === m 
+                  ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
+                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
+              }`}
+            >
+              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
+          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+            <button
+              key={num}
+              onClick={() => handleScoreInput(num)}
+              disabled={gameState !== 'playing'}
+              className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
+                (players[currentPlayerIndex].asteroidsHits?.[num] || 0) >= 3
+                  ? 'border-zinc-900 bg-zinc-900/50 text-zinc-700'
+                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+              }`}
+            >
+              <span className="text-2xl font-black font-display italic">{num}</span>
+            </button>
+          ))}
+          
+          <button
+            onClick={() => handleScoreInput(25)}
+            disabled={gameState !== 'playing'}
+            className="col-span-2 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+          >
+            BULL
+          </button>
+          
+          <button
+            onClick={() => handleScoreInput(0)}
+            disabled={gameState !== 'playing'}
+            className="col-span-2 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+          >
+            MISS
+          </button>
+        </div>
+
+        <button
+          onClick={handleUndo}
+          disabled={gameState !== 'playing' || currentDartIndex === 0}
           className="w-full py-6 flex items-center justify-center gap-4 border-2 border-zinc-800 text-zinc-500 hover:border-white hover:text-white disabled:opacity-10 transition-all font-black tracking-[0.2em] text-sm italic font-display"
         >
           <RotateCcw size={18} />
