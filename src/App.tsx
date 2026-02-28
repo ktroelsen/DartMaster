@@ -487,14 +487,38 @@ function Game301({
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-2xl flex flex-col items-center justify-center p-12 text-center"
+            className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={120} className="text-yellow-400 mb-8 drop-shadow-[0_0_40px_rgba(234,179,8,0.4)]" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-red-500 mb-4">Championship Winner</h2>
-            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_40px_rgba(234,179,8,0.4)]" />
+            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-red-500 mb-2">Championship Winner</h2>
+            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name}</h3>
+            
+            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+                <div className="text-left">Pos</div>
+                <div className="text-left">Player</div>
+                <div className="text-right">Remaining</div>
+                <div className="text-right">Gap</div>
+              </div>
+              {[...players].sort((a, b) => a.score - b.score).map((p, i, arr) => {
+                const score = p.score;
+                const winnerScore = arr[0].score;
+                const gap = i === 0 ? '-' : `+${score - winnerScore}`;
+                
+                return (
+                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-red-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-2xl font-black text-white">{score}</div>
+                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  </div>
+                );
+              })}
+            </div>
+
             <button 
               onClick={onGoHome}
-              className="bg-red-600 text-white px-16 py-5 font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-[0_0_30px_rgba(220,38,38,0.3)]"
+              className="bg-red-600 text-white px-12 py-4 font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-[0_0_30px_rgba(220,38,38,0.3)] rounded-full"
             >
               Return to Base
             </button>
@@ -809,14 +833,38 @@ function GameMoon({
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 z-50 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+            className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={120} className="text-yellow-400 mb-8 drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-yellow-400 mb-4">Mission Accomplished</h2>
-            <h3 className="text-7xl font-display italic font-black text-white mb-12">{winner.name} Reached the Moon!</h3>
+            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
+            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-yellow-400 mb-2">Mission Accomplished</h2>
+            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name} Reached the Moon!</h3>
+            
+            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+                <div className="text-left">Pos</div>
+                <div className="text-left">Player</div>
+                <div className="text-right">Steps Left</div>
+                <div className="text-right">Gap</div>
+              </div>
+              {[...players].sort((a, b) => (a.moonSteps || 0) - (b.moonSteps || 0)).map((p, i, arr) => {
+                const score = p.moonSteps || 0;
+                const winnerScore = arr[0].moonSteps || 0;
+                const gap = i === 0 ? '-' : `+${score - winnerScore}`;
+                
+                return (
+                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-yellow-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-2xl font-black text-white">{score}</div>
+                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  </div>
+                );
+              })}
+            </div>
+
             <button 
               onClick={onGoHome}
-              className="bg-white text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-white transition-all"
+              className="bg-white text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-white transition-all rounded-full shadow-[0_0_30px_rgba(255,255,255,0.1)]"
             >
               Return to Base
             </button>
@@ -1134,14 +1182,38 @@ function GameAround({
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+            className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={120} className="text-yellow-400 mb-8 animate-bounce" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-blue-500 mb-4">World Champion</h2>
-            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_30px_rgba(234,179,8,0.4)]" />
+            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-blue-500 mb-2">World Champion</h2>
+            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name}</h3>
+            
+            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+                <div className="text-left">Pos</div>
+                <div className="text-left">Player</div>
+                <div className="text-right">Progress</div>
+                <div className="text-right">Gap</div>
+              </div>
+              {[...players].sort((a, b) => (b.aroundNumber || 1) - (a.aroundNumber || 1)).map((p, i, arr) => {
+                const score = p.aroundNumber || 1;
+                const winnerScore = arr[0].aroundNumber || 1;
+                const gap = i === 0 ? '-' : `-${winnerScore - score}`;
+                
+                return (
+                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-blue-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-2xl font-black text-white">{score}/20</div>
+                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  </div>
+                );
+              })}
+            </div>
+
             <button 
               onClick={onGoHome}
-              className="bg-blue-600 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+              className="bg-blue-600 text-white px-12 py-4 font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all rounded-full shadow-[0_0_30px_rgba(37,99,235,0.3)]"
             >
               Return Home
             </button>
@@ -1568,14 +1640,38 @@ function GameFootball({
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+            className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={120} className="text-yellow-400 mb-8 animate-bounce" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-emerald-500 mb-4">Match Winner</h2>
-            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_30px_rgba(234,179,8,0.4)]" />
+            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-emerald-500 mb-2">Match Winner</h2>
+            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name}</h3>
+            
+            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+                <div className="text-left">Pos</div>
+                <div className="text-left">Player</div>
+                <div className="text-right">Goals</div>
+                <div className="text-right">Gap</div>
+              </div>
+              {[...players].sort((a, b) => (b.footballGoals || 0) - (a.footballGoals || 0)).map((p, i, arr) => {
+                const score = p.footballGoals || 0;
+                const winnerScore = arr[0].footballGoals || 0;
+                const gap = i === 0 ? '-' : `-${winnerScore - score}`;
+                
+                return (
+                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-emerald-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-2xl font-black text-white">{score}</div>
+                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  </div>
+                );
+              })}
+            </div>
+
             <button 
               onClick={onGoHome}
-              className="bg-emerald-600 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+              className="bg-emerald-600 text-white px-12 py-4 font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all rounded-full shadow-[0_0_30px_rgba(16,185,129,0.3)]"
             >
               Return Home
             </button>
@@ -1836,21 +1932,23 @@ function GameAsteroids({
           ))}
         </div>
 
-        <div className="relative z-10 text-center mb-8">
+        <div className="absolute top-12 left-12 z-10 text-left">
           <div className="text-xs font-mono uppercase tracking-[0.5em] text-zinc-500 mb-2">Asteroid Belt</div>
           <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-zinc-500">/{MAX_ROUNDS}</span></h2>
-          <div className="mt-4 flex items-center justify-center gap-6 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-            <span className="flex items-center gap-2">👽 <span className="text-zinc-500">=</span> 1P</span>
-            <span className="flex items-center gap-2">🚀 <span className="text-zinc-500">=</span> 3P</span>
-            <span className="flex items-center gap-2">🪐 <span className="text-zinc-500">=</span> 5P</span>
+          <div className="mt-10 flex flex-col gap-6 text-4xl font-mono text-zinc-400 uppercase tracking-widest">
+            <span className="flex items-center gap-6"><span className="text-6xl">👽</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">1P</span></span>
+            <span className="flex items-center gap-6"><span className="text-6xl">🚀</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">3P</span></span>
+            <span className="flex items-center gap-6"><span className="text-6xl">🪐</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">5P</span></span>
           </div>
-          {round === MAX_ROUNDS && (
-            <div className="mt-2 text-yellow-500 font-mono text-xs animate-pulse uppercase tracking-widest font-bold">DOUBLE POINTS ROUND</div>
-          )}
         </div>
 
         {/* The Asteroid / Dartboard */}
-        <div className="relative w-[400px] h-[400px] md:w-[550px] md:h-[550px]">
+        <div className="relative w-[400px] h-[400px] md:w-[550px] md:h-[550px] flex items-center justify-center">
+          {round === MAX_ROUNDS && (
+            <div className="absolute z-30 pointer-events-none text-yellow-500/40 font-display italic font-black text-3xl md:text-5xl uppercase tracking-[0.2em] text-center select-none leading-[0.9] animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]">
+              DOUBLE<br/>POINTS<br/>ROUND
+            </div>
+          )}
           {/* Asteroid Sphere */}
           <div className="absolute inset-0 rounded-full bg-zinc-900 border-4 border-zinc-800 shadow-[0_0_100px_rgba(255,255,255,0.05)] overflow-hidden">
             {/* Craters (Abstract) */}
@@ -1963,17 +2061,17 @@ function GameAsteroids({
           )}
         </div>
 
-        {/* Player List / Scores */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+        {/* Player List / Scores (Vertical on the right) */}
+        <div className="absolute top-12 right-12 z-10 flex flex-col gap-6 w-72">
           {players.map((p, i) => (
             <div 
               key={i} 
-              className={`p-4 border-2 transition-all rounded-xl ${i === currentPlayerIndex ? 'border-zinc-400 bg-zinc-400/10' : 'border-zinc-800 bg-black/40'}`}
+              className={`p-6 border-2 transition-all rounded-2xl ${i === currentPlayerIndex ? 'border-zinc-400 bg-zinc-400/10 shadow-[0_0_30px_rgba(255,255,255,0.05)]' : 'border-zinc-800 bg-black/40'}`}
             >
-              <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{p.name}</div>
+              <div className="text-xl font-mono uppercase tracking-[0.2em] text-zinc-400 mb-2 font-bold">{p.name}</div>
               <div className="flex justify-between items-end">
-                <div className="text-3xl font-display italic font-black text-white">{p.asteroidsScore || 0}</div>
-                <div className="text-[10px] font-mono text-zinc-600">PTS</div>
+                <div className="text-6xl font-display italic font-black text-white">{p.asteroidsScore || 0}</div>
+                <div className="text-xl font-mono text-zinc-600 font-bold">PTS</div>
               </div>
             </div>
           ))}
@@ -1983,14 +2081,38 @@ function GameAsteroids({
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+            className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={120} className="text-yellow-400 mb-8" />
-            <h2 className="text-2xl font-mono uppercase tracking-[0.5em] text-zinc-500 mb-4">Asteroid Ace</h2>
-            <h3 className="text-8xl font-display italic font-black text-white mb-12">{winner.name}</h3>
+            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_30px_rgba(234,179,8,0.4)]" />
+            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-zinc-500 mb-2">Asteroid Ace</h2>
+            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name}</h3>
+            
+            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+                <div className="text-left">Pos</div>
+                <div className="text-left">Player</div>
+                <div className="text-right">Score</div>
+                <div className="text-right">Gap</div>
+              </div>
+              {[...players].sort((a, b) => (b.asteroidsScore || 0) - (a.asteroidsScore || 0)).map((p, i, arr) => {
+                const score = p.asteroidsScore || 0;
+                const leaderScore = arr[0].asteroidsScore || 0;
+                const gap = i === 0 ? '-' : `-${leaderScore - score}`;
+                
+                return (
+                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-yellow-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-2xl font-black text-white">{score}</div>
+                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  </div>
+                );
+              })}
+            </div>
+
             <button 
               onClick={onGoHome}
-              className="bg-zinc-100 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all"
+              className="bg-zinc-100 text-black px-12 py-4 font-black uppercase tracking-widest hover:bg-white transition-all rounded-full shadow-[0_0_30px_rgba(255,255,255,0.1)]"
             >
               Return Home
             </button>
@@ -2005,20 +2127,20 @@ function GameAsteroids({
             <ArrowLeft size={14} /> Abandon Mission
           </button>
           
-          <div className="p-6 bg-zinc-600/10 border-2 border-zinc-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-2">Current Pilot</div>
-            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="text-xs font-mono text-zinc-500">Total Score:</div>
-              <div className="text-3xl font-black text-white font-display">{players[currentPlayerIndex].asteroidsScore || 0}</div>
+          <div className="p-8 bg-zinc-600/10 border-2 border-zinc-600 rounded-2xl mb-10">
+            <div className="text-sm font-mono uppercase tracking-[0.3em] text-zinc-400 mb-4">Current Pilot</div>
+            <div className="text-6xl font-display italic font-black uppercase mb-6">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-6 pt-6 border-t border-zinc-800">
+              <div className="text-base font-mono text-zinc-500 uppercase tracking-widest">Total Score:</div>
+              <div className="text-5xl font-black text-white font-display italic">{players[currentPlayerIndex].asteroidsScore || 0}</div>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             {[0, 1, 2].map(dartIdx => (
               <div 
                 key={dartIdx}
-                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                className={`flex-1 h-24 border-2 rounded-2xl flex items-center justify-center font-mono text-3xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
                     ? 'bg-zinc-600 border-zinc-500 text-black' 
                     : dartIdx === currentDartIndex 
@@ -2026,7 +2148,7 @@ function GameAsteroids({
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
-                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={32} className="opacity-20" />}
               </div>
             ))}
           </div>
