@@ -140,63 +140,64 @@ function HomePage({
           <p className="text-sm opacity-80 uppercase tracking-[0.4em] font-mono text-green-500 font-bold">Tournament Edition</p>
         </motion.header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left: Player Management & Leaderboard */}
-          <div className="lg:col-span-2 space-y-8">
-            <section className="bg-zinc-900/80 backdrop-blur-md border-2 border-zinc-800 p-8 shadow-2xl">
+          <div className="lg:col-span-4 space-y-8">
+            <section className="bg-zinc-900/80 backdrop-blur-md border-2 border-zinc-800 p-6 shadow-2xl h-full flex flex-col">
               <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-                <h2 className="text-3xl font-display italic font-bold text-white">TOURNAMENT STANDINGS</h2>
+                <h2 className="text-2xl font-display italic font-bold text-white uppercase tracking-tight">Standings</h2>
                 <button 
                   onClick={onReset}
                   className="text-[10px] font-mono uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors"
                 >
-                  Reset All
+                  Reset
                 </button>
               </div>
 
-              {players.length > 0 ? (
-                <div className="space-y-3">
-                  {[...players].sort((a, b) => b.tournamentPoints - a.tournamentPoints).map((p, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 bg-black/40 border border-zinc-800 group hover:border-green-500/50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-8 h-8 flex items-center justify-center font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
-                          {idx + 1}
+              <div className="flex-1 overflow-y-auto min-h-[300px] pr-2 custom-scrollbar">
+                {players.length > 0 ? (
+                  <div className="space-y-2">
+                    {[...players].sort((a, b) => b.tournamentPoints - a.tournamentPoints).map((p, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-black/40 border border-zinc-800 group hover:border-green-500/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 flex items-center justify-center text-[10px] font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
+                            {idx + 1}
+                          </div>
+                          <span className="text-lg font-serif text-white truncate max-w-[120px]">{p.name}</span>
                         </div>
-                        <span className="text-xl font-serif text-white">{p.name}</span>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <div className="text-[10px] font-mono uppercase opacity-40">Points</div>
-                          <div className="text-2xl font-black text-green-500">{p.tournamentPoints}</div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <div className="text-xl font-black text-green-500">{p.tournamentPoints}</div>
+                          </div>
+                          <button 
+                            onClick={() => setPlayers(players.filter(player => player.name !== p.name))}
+                            className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 p-1 transition-all"
+                          >
+                            &times;
+                          </button>
                         </div>
-                        <button 
-                          onClick={() => setPlayers(players.filter(player => player.name !== p.name))}
-                          className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 p-2 transition-all"
-                        >
-                          &times;
-                        </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-12 text-center border-2 border-dashed border-zinc-800 opacity-30">
-                  <p className="font-mono uppercase tracking-widest">No players in tournament</p>
-                </div>
-              )}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center border-2 border-dashed border-zinc-800 opacity-30 p-8">
+                    <p className="font-mono uppercase tracking-widest text-xs text-center">No players in tournament</p>
+                  </div>
+                )}
+              </div>
 
-              <div className="mt-8 flex gap-2">
+              <div className="mt-6 pt-6 border-t border-zinc-800 flex gap-2">
                 <input 
                   type="text" 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-                  placeholder="Enter Player Name..."
-                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-3 px-4 focus:outline-none focus:border-green-500 text-white font-serif"
+                  placeholder="Player Name..."
+                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-2 px-3 focus:outline-none focus:border-green-500 text-white font-serif text-sm"
                 />
                 <button 
                   onClick={addPlayer}
-                  className="bg-green-600 hover:bg-green-500 px-6 font-bold uppercase tracking-widest text-xs transition-colors"
+                  className="bg-green-600 hover:bg-green-500 px-4 font-bold uppercase tracking-widest text-[10px] transition-colors"
                 >
                   Add
                 </button>
@@ -204,81 +205,101 @@ function HomePage({
             </section>
           </div>
 
-          {/* Right: Game Selection */}
-          <div className="space-y-6">
-            <div className="text-xs font-mono uppercase tracking-[0.3em] text-zinc-500 mb-2">Select Game</div>
+          {/* Right: Game Selection Grid */}
+          <div className="lg:col-span-8">
+            <div className="text-xs font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-4">
+              <span className="flex-none">Select Mission</span>
+              <div className="h-[1px] w-full bg-zinc-800"></div>
+            </div>
             
-            <button
-              onClick={() => onSelectGame('301')}
-              disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-red-600 p-8 hover:bg-red-600 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(220,38,38,0.1)] disabled:opacity-20 disabled:grayscale"
-            >
-              <div className="relative z-10">
-                <Target size={32} className="text-red-500 group-hover:text-white mb-8 transition-colors" />
-                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">301 DOWN</h2>
-                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Countdown to zero.</p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onSelectGame('moon')}
-              disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-yellow-500 p-8 hover:bg-yellow-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.1)] disabled:opacity-20 disabled:grayscale"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-yellow-500 group-hover:text-white transition-colors" />
-                  <span className="bg-yellow-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                onClick={() => onSelectGame('301')}
+                disabled={players.length < 1}
+                className="group relative bg-zinc-900/80 backdrop-blur-sm border-2 border-red-600/30 p-6 hover:bg-red-600 hover:border-red-500 transition-all duration-500 text-left overflow-hidden shadow-xl disabled:opacity-20 disabled:grayscale rounded-xl"
+              >
+                <div className="relative z-10">
+                  <Target size={24} className="text-red-500 group-hover:text-white mb-6 transition-colors" />
+                  <h2 className="text-2xl font-bold mb-1 italic font-display group-hover:text-white">301 DOWN</h2>
+                  <p className="text-[10px] opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Countdown to zero.</p>
                 </div>
-                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">TO THE MOON</h2>
-                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Race to the lunar surface.</p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onSelectGame('around')}
-              disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-blue-600 p-8 hover:bg-blue-600 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.1)] disabled:opacity-20 disabled:grayscale"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-blue-500 group-hover:text-white transition-colors" />
-                  <span className="bg-blue-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Target size={120} />
                 </div>
-                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">AROUND THE WORLD</h2>
-                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Hit 1-20 in order. 7 rounds to finish.</p>
-              </div>
-            </button>
+              </button>
 
-            <button
-              onClick={() => onSelectGame('football')}
-              disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-emerald-500 p-8 hover:bg-emerald-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.1)] disabled:opacity-20 disabled:grayscale"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-emerald-500 group-hover:text-white transition-colors" />
-                  <span className="bg-emerald-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+              <button
+                onClick={() => onSelectGame('moon')}
+                disabled={players.length < 1}
+                className="group relative bg-zinc-900/80 backdrop-blur-sm border-2 border-yellow-500/30 p-6 hover:bg-yellow-500 hover:border-yellow-400 transition-all duration-500 text-left overflow-hidden shadow-xl disabled:opacity-20 disabled:grayscale rounded-xl"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <Rocket size={24} className="text-yellow-500 group-hover:text-white transition-colors" />
+                    <span className="bg-yellow-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white rounded">New</span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-1 italic font-display group-hover:text-white">TO THE MOON</h2>
+                  <p className="text-[10px] opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Race to the lunar surface.</p>
                 </div>
-                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">FOOTBALL</h2>
-                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Pass the ball and score goals. 7 rounds of action.</p>
-              </div>
-            </button>
+                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Rocket size={120} />
+                </div>
+              </button>
 
-            <button
-              onClick={() => onSelectGame('asteroids')}
-              disabled={players.length < 1}
-              className="w-full group relative bg-zinc-900 border-2 border-zinc-500 p-8 hover:bg-zinc-500 transition-all duration-500 text-left overflow-hidden shadow-[0_0_30px_rgba(113,113,122,0.1)] disabled:opacity-20 disabled:grayscale"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-8">
-                  <Target size={32} className="text-zinc-500 group-hover:text-white transition-colors" />
-                  <span className="bg-zinc-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white">New Game</span>
+              <button
+                onClick={() => onSelectGame('around')}
+                disabled={players.length < 1}
+                className="group relative bg-zinc-900/80 backdrop-blur-sm border-2 border-blue-600/30 p-6 hover:bg-blue-600 hover:border-blue-500 transition-all duration-500 text-left overflow-hidden shadow-xl disabled:opacity-20 disabled:grayscale rounded-xl"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <Orbit size={24} className="text-blue-500 group-hover:text-white transition-colors" />
+                    <span className="bg-blue-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white rounded">New</span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-1 italic font-display group-hover:text-white">AROUND THE WORLD</h2>
+                  <p className="text-[10px] opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Hit 1-20 in order. 7 rounds.</p>
                 </div>
-                <h2 className="text-3xl font-bold mb-2 italic font-display group-hover:text-white">ASTEROIDS</h2>
-                <p className="text-xs opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">4 rounds. Hit numbers to clear space debris.</p>
-              </div>
-            </button>
+                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Orbit size={120} />
+                </div>
+              </button>
+
+              <button
+                onClick={() => onSelectGame('football')}
+                disabled={players.length < 1}
+                className="group relative bg-zinc-900/80 backdrop-blur-sm border-2 border-emerald-500/30 p-6 hover:bg-emerald-600 hover:border-emerald-500 transition-all duration-500 text-left overflow-hidden shadow-xl disabled:opacity-20 disabled:grayscale rounded-xl"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <Target size={24} className="text-emerald-500 group-hover:text-white transition-colors" />
+                    <span className="bg-emerald-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white rounded">New</span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-1 italic font-display group-hover:text-white">FOOTBALL</h2>
+                  <p className="text-[10px] opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Pass the ball and score goals.</p>
+                </div>
+                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Target size={120} className="rotate-45" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => onSelectGame('asteroids')}
+                disabled={players.length < 1}
+                className="group relative bg-zinc-900/80 backdrop-blur-sm border-2 border-zinc-500/30 p-6 hover:bg-zinc-500 hover:border-zinc-400 transition-all duration-500 text-left overflow-hidden shadow-xl disabled:opacity-20 disabled:grayscale rounded-xl md:col-span-2"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <Ghost size={24} className="text-zinc-500 group-hover:text-white transition-colors" />
+                    <span className="bg-zinc-600 text-[8px] px-2 py-1 font-mono font-bold uppercase tracking-tighter text-white rounded">New</span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-1 italic font-display group-hover:text-white">ASTEROIDS</h2>
+                  <p className="text-[10px] opacity-60 group-hover:opacity-90 font-mono uppercase tracking-wider">Hit numbers to clear space debris. 4 rounds of chaos.</p>
+                </div>
+                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Ghost size={120} />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -303,9 +324,11 @@ function Game301({
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [winner, setWinner] = useState<Player | null>(null);
   const [hasFinished, setHasFinished] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const dartboardNumbers = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
   const handleScoreInput = (baseValue: number) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isWaiting) return;
 
     const points = baseValue * multiplier;
     const currentPlayer = players[currentPlayerIndex];
@@ -329,27 +352,34 @@ function Game301({
     }
 
     if (isTurnOver) {
-      // End of turn logic
-      updatedPlayers[currentPlayerIndex].history.push(newTurnDarts);
+      setIsWaiting(true);
+      setCurrentTurnDarts(newTurnDarts);
+      setCurrentDartIndex(currentDartIndex + 1);
       
-      if (isLastPlayer && someoneFinished) {
-        // End of round and someone has finished - Game Over
-        const sortedByScore = [...updatedPlayers].sort((a, b) => a.score - b.score);
-        setWinner(sortedByScore[0]);
-        setGameState('won');
+      setTimeout(() => {
+        // End of turn logic
+        updatedPlayers[currentPlayerIndex].history.push(newTurnDarts);
         
-        const rankings = sortedByScore.map((p, idx) => ({
-          name: p.name,
-          points: idx === 0 ? 10 : idx === 1 ? 5 : idx === 2 ? 2 : 0
-        }));
-        onGameEnd(rankings);
-      } else {
-        // Move to next player
-        setMultiplier(1);
-        setCurrentDartIndex(0);
-        setCurrentTurnDarts([]);
-        setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
-      }
+        if (isLastPlayer && someoneFinished) {
+          // End of round and someone has finished - Game Over
+          const sortedByScore = [...updatedPlayers].sort((a, b) => a.score - b.score);
+          setWinner(sortedByScore[0]);
+          setGameState('won');
+          
+          const rankings = sortedByScore.map((p, idx) => ({
+            name: p.name,
+            points: idx === 0 ? 10 : idx === 1 ? 5 : idx === 2 ? 2 : 0
+          }));
+          onGameEnd(rankings);
+        } else {
+          // Move to next player
+          setMultiplier(1);
+          setCurrentDartIndex(0);
+          setCurrentTurnDarts([]);
+          setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
+        }
+        setIsWaiting(false);
+      }, 3000);
     } else {
       // Continue turn
       setMultiplier(1);
@@ -577,45 +607,65 @@ function Game301({
           ))}
         </div>
 
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
-          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-            <button
-              key={num}
-              onClick={() => handleScoreInput(num)}
-              disabled={gameState !== 'playing'}
-              className="aspect-square flex flex-col items-center justify-center border-2 border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300 transition-all active:scale-95 disabled:opacity-10"
-            >
-              <span className="text-2xl font-black font-display italic">{num}</span>
-            </button>
-          ))}
+        <div className="flex-1 flex flex-col items-center justify-center mb-8">
+          <div className="relative w-full aspect-square max-w-[340px]">
+            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-9">
+              {dartboardNumbers.map((num, i) => {
+                const angle = i * 18;
+                
+                const textAngle = (angle + 9) * (Math.PI / 180);
+                const tx = 50 + 40 * Math.sin(textAngle);
+                const ty = 50 - 40 * Math.cos(textAngle);
+
+                return (
+                  <g 
+                    key={num} 
+                    onClick={() => handleScoreInput(num)}
+                    className="cursor-pointer group/seg transition-all hover:opacity-100"
+                  >
+                    <path
+                      d="M 50 50 L 50 0 A 50 50 0 0 1 65.45 2.45 Z"
+                      transform={`rotate(${angle} 50 50)`}
+                      className="fill-zinc-900 stroke-zinc-800 stroke-[0.5] group-hover/seg:fill-zinc-800 group-hover/seg:stroke-zinc-600 transition-colors"
+                    />
+                    <text 
+                      x={tx} 
+                      y={ty} 
+                      fontSize="4.5" 
+                      fill="white" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle" 
+                      className="font-mono font-black select-none pointer-events-none opacity-40 group-hover/seg:opacity-100"
+                      transform={`rotate(${9} ${tx} ${ty})`}
+                    >
+                      {num}
+                    </text>
+                  </g>
+                );
+              })}
+              {/* Bullseye */}
+              <circle 
+                cx="50" cy="50" r="10" 
+                onClick={() => handleScoreInput(25)}
+                className="fill-zinc-900 stroke-zinc-800 stroke-1 cursor-pointer hover:fill-zinc-800 hover:stroke-zinc-600 transition-colors" 
+              />
+              <text 
+                x="50" y="50" 
+                fontSize="3" fill="white" 
+                textAnchor="middle" dominantBaseline="middle" 
+                className="font-mono font-bold pointer-events-none opacity-40"
+              >
+                BULL
+              </text>
+            </svg>
+          </div>
           
           <button
             onClick={() => handleScoreInput(0)}
             disabled={gameState !== 'playing'}
-            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+            className="w-full mt-8 py-8 text-3xl font-black font-display italic tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-2xl bg-zinc-900/50 text-zinc-400"
           >
             MISS
-          </button>
-
-          <button
-            onClick={() => {
-              setMultiplier(1);
-              handleScoreInput(25);
-            }}
-            disabled={gameState !== 'playing'}
-            className="col-span-2 py-4 text-xs font-mono font-bold uppercase border-2 border-zinc-800 hover:border-red-500 hover:text-red-500 transition-all active:scale-95"
-          >
-            Outer Bull (25)
-          </button>
-          <button
-            onClick={() => {
-              setMultiplier(1);
-              handleScoreInput(50);
-            }}
-            disabled={gameState !== 'playing'}
-            className="col-span-2 py-4 text-xs font-mono font-bold uppercase border-2 border-zinc-800 hover:border-red-500 hover:text-red-500 transition-all active:scale-95"
-          >
-            Inner Bull (50)
           </button>
         </div>
 
@@ -660,68 +710,80 @@ function GameMoon({
   );
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentDartIndex, setCurrentDartIndex] = useState(0);
-  const [currentTurnDarts, setCurrentTurnDarts] = useState<number[]>([]);
+  const [currentTurnDarts, setCurrentTurnDarts] = useState<string[]>([]);
+  const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [winner, setWinner] = useState<Player | null>(null);
   const [round, setRound] = useState(1);
+  const [isWaiting, setIsWaiting] = useState(false);
   const MAX_ROUNDS = 7;
+  const dartboardNumbers = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
   const handleScoreInput = (num: number) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isWaiting) return;
 
     const updatedPlayers = [...players];
     const currentPlayer = updatedPlayers[currentPlayerIndex];
+    const dartLabel = num === 0 ? 'MISS' : multiplier === 2 ? `D${num}` : multiplier === 3 ? `T${num}` : `${num}`;
 
     // Check if hit own number
     if (num === currentPlayer.targetNumber) {
-      currentPlayer.moonSteps = Math.min(10, (currentPlayer.moonSteps || 0) + 1);
+      currentPlayer.moonSteps = Math.min(10, (currentPlayer.moonSteps || 0) + multiplier);
     } 
     // Check if hit someone else's number
-    else {
+    else if (num !== 0) {
       const victimIndex = updatedPlayers.findIndex(p => p.targetNumber === num);
       if (victimIndex !== -1 && victimIndex !== currentPlayerIndex) {
-        updatedPlayers[victimIndex].moonSteps = Math.max(0, (updatedPlayers[victimIndex].moonSteps || 0) - 1);
+        updatedPlayers[victimIndex].moonSteps = Math.max(0, (updatedPlayers[victimIndex].moonSteps || 0) - multiplier);
       }
     }
 
-    const newTurnDarts = [...currentTurnDarts, num];
+    const newTurnDarts = [...currentTurnDarts, dartLabel];
+    setMultiplier(1);
     
     if (currentDartIndex < 2) {
       setCurrentDartIndex(currentDartIndex + 1);
       setCurrentTurnDarts(newTurnDarts);
     } else {
       // End of turn
-      currentPlayer.history.push(newTurnDarts);
-      setPlayers(updatedPlayers);
-      setCurrentDartIndex(0);
-      setCurrentTurnDarts([]);
-      
-      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
-      if (nextPlayerIdx === 0) {
-        // End of round
-        if (round >= MAX_ROUNDS || updatedPlayers.some(p => p.moonSteps === 10)) {
-          // Game Over
-          const sortedByProgress = [...updatedPlayers].sort((a, b) => (b.moonSteps || 0) - (a.moonSteps || 0));
-          setWinner(sortedByProgress[0]);
-          setGameState('won');
-          
-          const distinctSteps = Array.from(new Set(updatedPlayers.map(p => p.moonSteps || 0))).sort((a, b) => b - a);
-          const rankings = updatedPlayers.map(p => {
-            const step = p.moonSteps || 0;
-            const rankIndex = distinctSteps.indexOf(step);
-            let points = 0;
-            if (rankIndex === 0) points = 10;
-            else if (rankIndex === 1) points = 5;
-            else if (rankIndex === 2) points = 2;
-            return { name: p.name, points };
-          });
-          onGameEnd(rankings);
+      setIsWaiting(true);
+      setCurrentTurnDarts(newTurnDarts);
+      setCurrentDartIndex(currentDartIndex + 1);
+
+      setTimeout(() => {
+        currentPlayer.history.push(newTurnDarts);
+        setPlayers(updatedPlayers);
+        setCurrentDartIndex(0);
+        setCurrentTurnDarts([]);
+        
+        const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+        if (nextPlayerIdx === 0) {
+          // End of round
+          if (round >= MAX_ROUNDS || updatedPlayers.some(p => p.moonSteps === 10)) {
+            // Game Over
+            const sortedByProgress = [...updatedPlayers].sort((a, b) => (b.moonSteps || 0) - (a.moonSteps || 0));
+            setWinner(sortedByProgress[0]);
+            setGameState('won');
+            
+            const distinctSteps = Array.from(new Set(updatedPlayers.map(p => p.moonSteps || 0))).sort((a, b) => b - a);
+            const rankings = updatedPlayers.map(p => {
+              const step = p.moonSteps || 0;
+              const rankIndex = distinctSteps.indexOf(step);
+              let points = 0;
+              if (rankIndex === 0) points = 10;
+              else if (rankIndex === 1) points = 5;
+              else if (rankIndex === 2) points = 2;
+              return { name: p.name, points };
+            });
+            onGameEnd(rankings);
+          } else {
+            setRound(round + 1);
+            setCurrentPlayerIndex(0);
+          }
         } else {
-          setRound(round + 1);
-          setCurrentPlayerIndex(0);
+          setCurrentPlayerIndex(nextPlayerIdx);
         }
-      } else {
-        setCurrentPlayerIndex(nextPlayerIdx);
-      }
+        setIsWaiting(false);
+      }, 3000);
     }
   };
 
@@ -906,33 +968,54 @@ function GameMoon({
           </div>
         </div>
 
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
-          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+        {/* Multiplier Selection */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[1, 2, 3].map((m) => (
             <button
-              key={num}
-              onClick={() => handleScoreInput(num)}
-              disabled={gameState !== 'playing'}
-              className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
-                players.some(p => p.targetNumber === num)
-                  ? num === players[currentPlayerIndex].targetNumber
-                    ? 'border-yellow-500 bg-yellow-600/20 text-white hover:bg-yellow-600'
-                    : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
-                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+              key={m}
+              onClick={() => setMultiplier(m as 1 | 2 | 3)}
+              className={`py-4 font-black font-display italic text-lg border-2 transition-all rounded-xl ${
+                multiplier === m 
+                  ? 'bg-yellow-500 border-yellow-400 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] scale-105' 
+                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
               }`}
             >
-              <span className="text-2xl font-black font-display italic">{num}</span>
-              {players.find(p => p.targetNumber === num) && (
-                <span className="text-[8px] font-mono uppercase mt-1 opacity-60">
-                  {players.find(p => p.targetNumber === num)?.name.slice(0, 3)}
-                </span>
-              )}
+              <div className="text-[8px] font-mono uppercase opacity-40 mb-1">Boost</div>
+              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
             </button>
           ))}
+        </div>
+
+        <div className="flex-1 flex flex-col gap-4 mb-8 overflow-y-auto pr-2">
+          {(Array.from(new Set(players.map(p => p.targetNumber).filter((n): n is number => n !== undefined))) as number[])
+            .sort((a, b) => a - b)
+            .map((num: number) => (
+              <button
+                key={num}
+                onClick={() => handleScoreInput(num)}
+                disabled={gameState !== 'playing' || isWaiting}
+                className={`h-24 flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 rounded-xl ${
+                  num === players[currentPlayerIndex].targetNumber
+                    ? 'border-yellow-500 bg-yellow-600/20 text-white hover:bg-yellow-600 shadow-[0_0_20px_rgba(234,179,8,0.2)]'
+                    : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
+                }`}
+              >
+                <div className="text-xs font-mono uppercase opacity-40 mb-1">Target</div>
+                <span className="text-4xl font-black font-display italic">{num}</span>
+                <div className="flex gap-1 mt-2">
+                  {players.filter(p => p.targetNumber === num).map((p, i) => (
+                    <span key={i} className="text-[10px] font-mono uppercase bg-white/10 px-2 py-0.5 rounded">
+                      {p.name.slice(0, 3)}
+                    </span>
+                  ))}
+                </div>
+              </button>
+            ))}
           
           <button
             onClick={() => handleScoreInput(0)}
-            disabled={gameState !== 'playing'}
-            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+            disabled={gameState !== 'playing' || isWaiting}
+            className="col-span-2 py-8 text-2xl font-black font-display italic tracking-[0.3em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-xl bg-zinc-900/50"
           >
             MISS
           </button>
@@ -980,10 +1063,11 @@ function GameAround({
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [winner, setWinner] = useState<Player | null>(null);
   const [round, setRound] = useState(1);
+  const [isWaiting, setIsWaiting] = useState(false);
   const MAX_ROUNDS = 7;
 
   const handleScoreInput = (num: number) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || isWaiting) return;
 
     const currentPlayer = players[currentPlayerIndex];
     const target = currentPlayer.aroundNumber || 1;
@@ -1016,38 +1100,45 @@ function GameAround({
       setCurrentTurnDarts(newTurnDarts);
     } else {
       // End of turn
-      updatedPlayers[currentPlayerIndex].history.push([]); // Just to track turns
-      setPlayers(updatedPlayers);
-      setCurrentDartIndex(0);
-      setCurrentTurnDarts([]);
-      
-      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
-      if (nextPlayerIdx === 0) {
-        // End of round
-        if (round >= MAX_ROUNDS || updatedPlayers.some(p => p.aroundNumber === 20)) {
-          // Game Over
-          const sortedByProgress = [...updatedPlayers].sort((a, b) => (b.aroundNumber || 0) - (a.aroundNumber || 0));
-          setWinner(sortedByProgress[0]);
-          setGameState('won');
-          
-          const distinctProgress = Array.from(new Set(updatedPlayers.map(p => p.aroundNumber || 0))).sort((a, b) => b - a);
-          const rankings = updatedPlayers.map(p => {
-            const prog = p.aroundNumber || 0;
-            const rankIndex = distinctProgress.indexOf(prog);
-            let points = 0;
-            if (rankIndex === 0) points = 10;
-            else if (rankIndex === 1) points = 5;
-            else if (rankIndex === 2) points = 2;
-            return { name: p.name, points };
-          });
-          onGameEnd(rankings);
+      setIsWaiting(true);
+      setCurrentTurnDarts(newTurnDarts);
+      setCurrentDartIndex(currentDartIndex + 1);
+
+      setTimeout(() => {
+        updatedPlayers[currentPlayerIndex].history.push([]); // Just to track turns
+        setPlayers(updatedPlayers);
+        setCurrentDartIndex(0);
+        setCurrentTurnDarts([]);
+        
+        const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+        if (nextPlayerIdx === 0) {
+          // End of round
+          if (round >= MAX_ROUNDS || updatedPlayers.some(p => p.aroundNumber === 20)) {
+            // Game Over
+            const sortedByProgress = [...updatedPlayers].sort((a, b) => (b.aroundNumber || 0) - (a.aroundNumber || 0));
+            setWinner(sortedByProgress[0]);
+            setGameState('won');
+            
+            const distinctProgress = Array.from(new Set(updatedPlayers.map(p => p.aroundNumber || 0))).sort((a, b) => b - a);
+            const rankings = updatedPlayers.map(p => {
+              const prog = p.aroundNumber || 0;
+              const rankIndex = distinctProgress.indexOf(prog);
+              let points = 0;
+              if (rankIndex === 0) points = 10;
+              else if (rankIndex === 1) points = 5;
+              else if (rankIndex === 2) points = 2;
+              return { name: p.name, points };
+            });
+            onGameEnd(rankings);
+          } else {
+            setRound(round + 1);
+            setCurrentPlayerIndex(0);
+          }
         } else {
-          setRound(round + 1);
-          setCurrentPlayerIndex(0);
+          setCurrentPlayerIndex(nextPlayerIdx);
         }
-      } else {
-        setCurrentPlayerIndex(nextPlayerIdx);
-      }
+        setIsWaiting(false);
+      }, 3000);
     }
   };
 
@@ -1255,46 +1346,52 @@ function GameAround({
           </div>
         </div>
 
-        {/* Multiplier Toggles */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[1, 2, 3].map((m) => (
-            <button
-              key={m}
-              onClick={() => setMultiplier(m as 1 | 2 | 3)}
-              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
-                multiplier === m 
-                  ? 'bg-blue-600 border-blue-500 text-black shadow-[0_0_20px_rgba(37,99,235,0.3)]' 
-                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
-              }`}
-            >
-              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
-            </button>
-          ))}
-        </div>
+        {/* Input Controls */}
+        <div className="flex-1 flex flex-col gap-6 mb-8">
+          {/* Multiplier Selection */}
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map((m) => (
+              <button
+                key={m}
+                onClick={() => setMultiplier(m as 1 | 2 | 3)}
+                className={`py-6 font-black font-display italic text-xl border-2 transition-all rounded-2xl ${
+                  multiplier === m 
+                    ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-105' 
+                    : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
+                }`}
+              >
+                <div className="text-[10px] font-mono uppercase opacity-40 mb-1">Multiplier</div>
+                {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
+              </button>
+            ))}
+          </div>
 
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
-          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
+          {/* Relevant Numbers Only */}
+          <div className="flex-1 flex flex-col gap-4">
             <button
-              key={num}
-              onClick={() => handleScoreInput(num)}
-              disabled={gameState !== 'playing'}
-              className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
-                num === currentTarget
-                  ? 'border-blue-500 bg-blue-600/20 text-white hover:bg-blue-600 hover:text-black'
-                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
-              }`}
+              onClick={() => handleScoreInput(currentTarget)}
+              disabled={gameState !== 'playing' || isWaiting}
+              className="flex-1 flex flex-col items-center justify-center border-4 border-blue-600 bg-blue-600/10 text-white hover:bg-blue-600 hover:text-black transition-all active:scale-95 disabled:opacity-10 rounded-3xl group relative overflow-hidden"
             >
-              <span className="text-2xl font-black font-display italic">{num}</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="text-sm font-mono uppercase tracking-[0.5em] text-blue-400 mb-2 group-hover:text-black transition-colors">Current Target</div>
+              <span className="text-9xl font-black font-display italic drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">
+                {currentTarget}
+              </span>
+              <div className="mt-4 flex items-center gap-2 text-blue-400 group-hover:text-black transition-colors">
+                <Target size={24} />
+                <span className="font-mono text-xs uppercase tracking-widest">Hit to Advance</span>
+              </div>
             </button>
-          ))}
-          
-          <button
-            onClick={() => handleScoreInput(0)}
-            disabled={gameState !== 'playing'}
-            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
-          >
-            MISS
-          </button>
+            
+            <button
+              onClick={() => handleScoreInput(0)}
+              disabled={gameState !== 'playing' || isWaiting}
+              className="py-8 text-3xl font-black font-display italic tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-2xl bg-zinc-900/50 text-zinc-400"
+            >
+              MISS
+            </button>
+          </div>
         </div>
 
         <button
@@ -1376,11 +1473,12 @@ function GameFootball({
   const [penaltyScores, setPenaltyScores] = useState<number[]>([0, 0]);
   const [showGoalAnimation, setShowGoalAnimation] = useState(false);
   const [goalText, setGoalText] = useState('GOAL!!!');
+  const [isWaiting, setIsWaiting] = useState(false);
 
   const MAX_ROUNDS = 7;
 
   const handleScoreInput = (num: number) => {
-    if (gameState === 'won') return;
+    if (gameState === 'won' || isWaiting) return;
 
     const updatedPlayers = [...players];
     const currentPlayer = updatedPlayers[currentPlayerIndex];
@@ -1451,44 +1549,53 @@ function GameFootball({
     const newTurnDarts = [...currentTurnDarts, dartLabel];
     setMultiplier(1);
 
-    if (currentDartIndex < 2) {
+    const maxDarts = gameState === 'penalties' ? 0 : 2;
+    if (currentDartIndex < maxDarts) {
       setCurrentDartIndex(currentDartIndex + 1);
       setCurrentTurnDarts(newTurnDarts);
     } else {
       // End of turn
-      currentPlayer.history.push([]); // Track turns
-      setPlayers(updatedPlayers);
-      setCurrentDartIndex(0);
-      setCurrentTurnDarts([]);
-      
-      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
-      if (nextPlayerIdx === 0) {
-        // End of round
-        if (gameState === 'playing') {
-          if (round >= MAX_ROUNDS) {
-            // Check for tie
-            const goals = updatedPlayers.map(p => p.footballGoals || 0);
-            if (goals.length > 1 && goals[0] === goals[1]) {
-              setGameState('penalties');
+      setIsWaiting(true);
+      setCurrentTurnDarts(newTurnDarts);
+      setCurrentDartIndex(currentDartIndex + 1);
+
+      setTimeout(() => {
+        currentPlayer.history.push([]); // Track turns
+        setPlayers(updatedPlayers);
+        setCurrentDartIndex(0);
+        setCurrentTurnDarts([]);
+        
+        const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+        if (nextPlayerIdx === 0) {
+          // End of round
+          if (gameState === 'playing') {
+            if (round >= MAX_ROUNDS) {
+              // Check for tie
+              const goals = updatedPlayers.map(p => p.footballGoals || 0);
+              if (goals.length > 1 && goals[0] === goals[1]) {
+                setGameState('penalties');
+              } else {
+                finishGame(updatedPlayers);
+              }
             } else {
-              finishGame(updatedPlayers);
+              setRound(round + 1);
+              setCurrentPlayerIndex(0);
             }
-          } else {
-            setRound(round + 1);
-            setCurrentPlayerIndex(0);
+          } else if (gameState === 'penalties') {
+            // Sudden Death: Check penalty result after both players have had 1 attempt
+            if (penaltyScores[0] !== penaltyScores[1]) {
+              finishGame(updatedPlayers);
+            } else {
+              setPenaltyRound(penaltyRound + 1);
+              setPenaltyScores([0, 0]);
+              setCurrentPlayerIndex(0);
+            }
           }
-        } else if (gameState === 'penalties') {
-          // Check penalty result
-          if (penaltyScores[0] !== penaltyScores[1]) {
-            finishGame(updatedPlayers);
-          } else {
-            setPenaltyRound(penaltyRound + 1);
-            setCurrentPlayerIndex(0);
-          }
+        } else {
+          setCurrentPlayerIndex(nextPlayerIdx);
         }
-      } else {
-        setCurrentPlayerIndex(nextPlayerIdx);
-      }
+        setIsWaiting(false);
+      }, 3000);
     }
   };
 
@@ -1624,7 +1731,12 @@ function GameFootball({
         <div className="mt-12 flex gap-12 items-center">
           <div className="text-center">
             <div className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">Round</div>
-            <div className="text-5xl font-display italic font-black text-white">{gameState === 'penalties' ? 'PENALTIES' : `${round}/${MAX_ROUNDS}`}</div>
+            <div className="text-5xl font-display italic font-black text-white">
+              {gameState === 'penalties' ? `PENALTY ${penaltyRound}` : `${round}/${MAX_ROUNDS}`}
+            </div>
+            {gameState === 'penalties' && (
+              <div className="text-xs font-mono uppercase tracking-[0.3em] text-red-500 mt-2 font-bold animate-pulse">Sudden Death</div>
+            )}
           </div>
           <div className="flex items-center gap-8 bg-black/40 border-2 border-white/10 p-6 rounded-2xl">
             {players.map((p, i) => (
@@ -1713,52 +1825,72 @@ function GameFootball({
           </div>
         </div>
 
-        {/* Multiplier Toggles */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[1, 2, 3].map((m) => (
-            <button
-              key={m}
-              onClick={() => setMultiplier(m as 1 | 2 | 3)}
-              disabled={showGoalAnimation}
-              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
-                multiplier === m 
-                  ? 'bg-emerald-600 border-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
-                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
-              }`}
-            >
-              {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
-          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => {
-            const isPossibleMove = gameState === 'playing' && FOOTBALL_CONNECTIONS[ballPos].some(m => nodeNumbers[m.target] === num);
-            const isPenaltyTarget = gameState === 'penalties' && ((currentPlayerIndex === 0 && num === nodeNumbers['goalR']) || (currentPlayerIndex === 1 && num === nodeNumbers['goalL']));
-
-            return (
+        {/* Input Controls */}
+        <div className="flex-1 flex flex-col gap-6 mb-8">
+          {/* Multiplier Selection */}
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map((m) => (
               <button
-                key={num}
-                onClick={() => handleScoreInput(num)}
-                disabled={gameState === 'won' || showGoalAnimation}
-                className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
-                  isPossibleMove || isPenaltyTarget
-                    ? 'border-emerald-500 bg-emerald-600/20 text-white hover:bg-emerald-600 hover:text-black'
-                    : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                key={m}
+                onClick={() => setMultiplier(m as 1 | 2 | 3)}
+                disabled={showGoalAnimation}
+                className={`py-6 font-black font-display italic text-xl border-2 transition-all rounded-2xl ${
+                  multiplier === m 
+                    ? 'bg-emerald-600 border-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)] scale-105' 
+                    : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
                 }`}
               >
-                <span className="text-2xl font-black font-display italic">{num}</span>
+                <div className="text-[10px] font-mono uppercase opacity-40 mb-1">Multiplier</div>
+                {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
               </button>
-            );
-          })}
-          
-          <button
-            onClick={() => handleScoreInput(0)}
-            disabled={gameState === 'won' || showGoalAnimation}
-            className="col-span-4 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
-          >
-            MISS
-          </button>
+            ))}
+          </div>
+
+          {/* Target Numbers Grid */}
+          <div className="flex-1 grid grid-cols-2 gap-4 overflow-y-auto pr-2">
+            {(() => {
+              const possibleNodes = gameState === 'penalties' 
+                ? [currentPlayerIndex === 0 ? 'goalR' : 'goalL']
+                : FOOTBALL_CONNECTIONS[ballPos].map(m => m.target);
+              
+              const uniqueTargets = Array.from(new Set(possibleNodes));
+              
+              return uniqueTargets.map(node => {
+                const num = nodeNumbers[node as FootballNode];
+                const pos = NODE_POSITIONS[node as FootballNode];
+                const weight = gameState === 'playing' ? FOOTBALL_CONNECTIONS[ballPos].find(m => m.target === node)?.weight : 1;
+                const hits = partialHits[node] || 0;
+
+                return (
+                  <button
+                    key={node}
+                    onClick={() => handleScoreInput(num)}
+                    disabled={gameState === 'won' || showGoalAnimation}
+                    className="h-32 flex flex-col items-center justify-center border-2 border-emerald-600/50 bg-emerald-600/10 text-white hover:bg-emerald-600 hover:text-black transition-all active:scale-95 disabled:opacity-10 rounded-2xl relative group"
+                  >
+                    <div className="text-[10px] font-mono uppercase opacity-40 mb-1 group-hover:text-black transition-colors">{pos.label}</div>
+                    <span className="text-5xl font-black font-display italic group-hover:scale-110 transition-transform">{num}</span>
+                    {weight === 2 && (
+                      <div className="mt-2 flex items-center gap-1">
+                        <div className={`w-2 h-2 rounded-full ${hits >= 1 ? 'bg-yellow-400' : 'bg-white/20'}`}></div>
+                        <div className={`w-2 h-2 rounded-full ${hits >= 2 ? 'bg-yellow-400' : 'bg-white/20'}`}></div>
+                        <span className="text-[8px] font-mono uppercase ml-1 opacity-60 group-hover:text-black">2 Hits Needed</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              });
+            })()}
+            
+            {/* Miss Button */}
+            <button
+              onClick={() => handleScoreInput(0)}
+              disabled={gameState === 'won' || showGoalAnimation}
+              className="col-span-2 py-8 text-3xl font-black font-display italic tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-2xl bg-zinc-900/50 text-zinc-400"
+            >
+              MISS
+            </button>
+          </div>
         </div>
 
         <button
@@ -1800,6 +1932,7 @@ function GameAsteroids({
   const [winner, setWinner] = useState<Player | null>(null);
   const [round, setRound] = useState(1);
   const [bullseyeActive, setBullseyeActive] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
   const MAX_ROUNDS = 4;
 
   const dartboardNumbers = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
@@ -1871,36 +2004,43 @@ function GameAsteroids({
       setCurrentDartIndex(currentDartIndex + 1);
       setCurrentTurnDarts(newTurnDarts);
     } else {
-      currentPlayer.history.push(newTurnDarts);
-      setPlayers(updatedPlayers);
-      setCurrentDartIndex(0);
-      setCurrentTurnDarts([]);
-      
-      const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
-      if (nextPlayerIdx === 0) {
-        if (round >= MAX_ROUNDS) {
-          const sortedByScore = [...updatedPlayers].sort((a, b) => (b.asteroidsScore || 0) - (a.asteroidsScore || 0));
-          setWinner(sortedByScore[0]);
-          setGameState('won');
-          
-          const distinctScores = Array.from(new Set(updatedPlayers.map(p => p.asteroidsScore || 0))).sort((a, b) => b - a);
-          const rankings = updatedPlayers.map(p => {
-            const score = p.asteroidsScore || 0;
-            const rankIndex = distinctScores.indexOf(score);
-            let points = 0;
-            if (rankIndex === 0) points = 10;
-            else if (rankIndex === 1) points = 5;
-            else if (rankIndex === 2) points = 2;
-            return { name: p.name, points };
-          });
-          onGameEnd(rankings);
+      setIsWaiting(true);
+      setCurrentTurnDarts(newTurnDarts);
+      setCurrentDartIndex(currentDartIndex + 1);
+
+      setTimeout(() => {
+        currentPlayer.history.push(newTurnDarts);
+        setPlayers(updatedPlayers);
+        setCurrentDartIndex(0);
+        setCurrentTurnDarts([]);
+        
+        const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
+        if (nextPlayerIdx === 0) {
+          if (round >= MAX_ROUNDS) {
+            const sortedByScore = [...updatedPlayers].sort((a, b) => (b.asteroidsScore || 0) - (a.asteroidsScore || 0));
+            setWinner(sortedByScore[0]);
+            setGameState('won');
+            
+            const distinctScores = Array.from(new Set(updatedPlayers.map(p => p.asteroidsScore || 0))).sort((a, b) => b - a);
+            const rankings = updatedPlayers.map(p => {
+              const score = p.asteroidsScore || 0;
+              const rankIndex = distinctScores.indexOf(score);
+              let points = 0;
+              if (rankIndex === 0) points = 10;
+              else if (rankIndex === 1) points = 5;
+              else if (rankIndex === 2) points = 2;
+              return { name: p.name, points };
+            });
+            onGameEnd(rankings);
+          } else {
+            setRound(round + 1);
+            setCurrentPlayerIndex(0);
+          }
         } else {
-          setRound(round + 1);
-          setCurrentPlayerIndex(0);
+          setCurrentPlayerIndex(nextPlayerIdx);
         }
-      } else {
-        setCurrentPlayerIndex(nextPlayerIdx);
-      }
+        setIsWaiting(false);
+      }, 3000);
     }
   };
 
@@ -2196,34 +2336,65 @@ function GameAsteroids({
           ))}
         </div>
 
-        <div className="flex-1 grid grid-cols-4 gap-3 mb-8">
-          {Array.from({ length: 20 }, (_, i) => i + 1).map(num => (
-            <button
-              key={num}
-              onClick={() => handleScoreInput(num)}
-              disabled={gameState !== 'playing'}
-              className={`aspect-square flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 ${
-                (players[currentPlayerIndex].asteroidsHits?.[num] || 0) >= 3
-                  ? 'border-zinc-900 bg-zinc-900/50 text-zinc-700'
-                  : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
-              }`}
-            >
-              <span className="text-2xl font-black font-display italic">{num}</span>
-            </button>
-          ))}
-          
-          <button
-            onClick={() => handleScoreInput(25)}
-            disabled={gameState !== 'playing'}
-            className="col-span-2 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
-          >
-            BULL
-          </button>
+        <div className="flex-1 flex flex-col items-center justify-center mb-8">
+          <div className="relative w-full aspect-square max-w-[340px]">
+            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-9">
+              {dartboardNumbers.map((num, i) => {
+                const angle = i * 18;
+                const hits = players[currentPlayerIndex].asteroidsHits?.[num] || 0;
+                const isClosed = hits >= 3;
+                
+                const textAngle = (angle + 9) * (Math.PI / 180);
+                const tx = 50 + 40 * Math.sin(textAngle);
+                const ty = 50 - 40 * Math.cos(textAngle);
+
+                return (
+                  <g 
+                    key={num} 
+                    onClick={() => !isClosed && handleScoreInput(num)}
+                    className={`cursor-pointer group/seg transition-all ${isClosed ? 'opacity-10 pointer-events-none' : 'hover:opacity-100'}`}
+                  >
+                    <path
+                      d="M 50 50 L 50 0 A 50 50 0 0 1 65.45 2.45 Z"
+                      transform={`rotate(${angle} 50 50)`}
+                      className="fill-zinc-900 stroke-zinc-800 stroke-[0.5] group-hover/seg:fill-zinc-800 group-hover/seg:stroke-zinc-600 transition-colors"
+                    />
+                    <text 
+                      x={tx} 
+                      y={ty} 
+                      fontSize="4.5" 
+                      fill="white" 
+                      textAnchor="middle" 
+                      dominantBaseline="middle" 
+                      className="font-mono font-black select-none pointer-events-none opacity-40 group-hover/seg:opacity-100"
+                      transform={`rotate(${9} ${tx} ${ty})`}
+                    >
+                      {num}
+                    </text>
+                  </g>
+                );
+              })}
+              {/* Bullseye */}
+              <circle 
+                cx="50" cy="50" r="10" 
+                onClick={() => !bullseyeActive && handleScoreInput(25)}
+                className={`fill-zinc-900 stroke-zinc-800 stroke-1 cursor-pointer hover:fill-zinc-800 hover:stroke-zinc-600 transition-colors ${bullseyeActive ? 'stroke-yellow-500 fill-yellow-500/20 pointer-events-none' : ''}`} 
+              />
+              <text 
+                x="50" y="50" 
+                fontSize="3" fill="white" 
+                textAnchor="middle" dominantBaseline="middle" 
+                className="font-mono font-bold pointer-events-none opacity-40"
+              >
+                BULL
+              </text>
+            </svg>
+          </div>
           
           <button
             onClick={() => handleScoreInput(0)}
             disabled={gameState !== 'playing'}
-            className="col-span-2 py-6 text-xl font-black font-display italic tracking-widest border-2 border-zinc-800 hover:bg-zinc-800 disabled:opacity-10 transition-all active:scale-95"
+            className="w-full mt-8 py-8 text-3xl font-black font-display italic tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-2xl bg-zinc-900/50 text-zinc-400"
           >
             MISS
           </button>
