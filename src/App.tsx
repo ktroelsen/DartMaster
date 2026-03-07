@@ -112,62 +112,62 @@ function HomePage({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative min-h-screen flex flex-col items-center justify-start overflow-y-auto py-12 px-6"
+      className="relative min-h-[100dvh] flex flex-col items-center justify-start overflow-y-auto py-8 md:py-12 px-4 md:px-6"
     >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0 fixed">
+      <div className="absolute inset-0 z-0 fixed pointer-events-none">
         <img 
           src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=1920" 
           alt="Bar Background" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-10 md:opacity-20"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f0f0f]/80 to-[#0f0f0f]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f0f0f]/90 to-[#0f0f0f]"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl w-full">
+      <div className="relative z-10 max-w-7xl w-full">
         <motion.header 
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center mb-12"
+          className="text-center mb-6 md:mb-12"
         >
-          <div className="inline-block mb-4 p-3 rounded-full bg-red-600/20 border border-red-500/30">
-            <Target size={48} className="text-red-500" />
+          <div className="inline-block mb-2 md:mb-4 p-2 md:p-3 rounded-full bg-red-600/20 border border-red-500/30">
+            <Target size={24} className="text-red-500 md:size-[48px]" />
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-2 italic font-display text-white drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-1 md:mb-2 italic font-display text-white drop-shadow-2xl">
             DART<span className="text-red-600">MASTER</span>
           </h1>
-          <p className="text-sm opacity-80 uppercase tracking-[0.4em] font-mono text-green-500 font-bold">Tournament Edition</p>
+          <p className="text-[8px] md:text-sm opacity-80 uppercase tracking-[0.2em] md:tracking-[0.4em] font-mono text-green-500 font-bold">Tournament Edition</p>
         </motion.header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           {/* Left: Player Management & Leaderboard */}
-          <div className="lg:col-span-4 space-y-8">
-            <section className="bg-zinc-900/80 backdrop-blur-md border-2 border-zinc-800 p-6 shadow-2xl h-full flex flex-col">
-              <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-                <h2 className="text-2xl font-display italic font-bold text-white uppercase tracking-tight">Standings</h2>
+          <div className="lg:col-span-4 space-y-6 md:space-y-8">
+            <section className="bg-zinc-900/80 backdrop-blur-md border-2 border-zinc-800 p-4 md:p-6 shadow-2xl h-full flex flex-col rounded-xl">
+              <div className="flex justify-between items-center mb-4 md:mb-6 border-b border-zinc-800 pb-4">
+                <h2 className="text-xl md:text-2xl font-display italic font-bold text-white uppercase tracking-tight">Standings</h2>
                 <button 
                   onClick={onReset}
-                  className="text-[10px] font-mono uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors"
+                  className="text-[8px] md:text-[10px] font-mono uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors"
                 >
                   Reset
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto min-h-[300px] pr-2 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto min-h-[200px] md:min-h-[300px] pr-2 custom-scrollbar">
                 {players.length > 0 ? (
                   <div className="space-y-2">
                     {[...players].sort((a, b) => b.tournamentPoints - a.tournamentPoints).map((p, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-black/40 border border-zinc-800 group hover:border-green-500/50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 flex items-center justify-center text-[10px] font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
+                      <div key={idx} className="flex items-center justify-between p-2 md:p-3 bg-black/40 border border-zinc-800 group hover:border-green-500/50 transition-colors rounded-lg">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className={`w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-[8px] md:text-[10px] font-mono font-bold ${idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-zinc-400 text-black' : idx === 2 ? 'bg-orange-700 text-white' : 'bg-zinc-800 text-zinc-500'}`}>
                             {idx + 1}
                           </div>
-                          <span className="text-lg font-serif text-white truncate max-w-[120px]">{p.name}</span>
+                          <span className="text-base md:text-lg font-serif text-white truncate max-w-[100px] md:max-w-[120px]">{p.name}</span>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 md:gap-4">
                           <div className="text-right">
-                            <div className="text-xl font-black text-green-500">{p.tournamentPoints}</div>
+                            <div className="text-lg md:text-xl font-black text-green-500">{p.tournamentPoints}</div>
                           </div>
                           <button 
                             onClick={() => setPlayers(players.filter(player => player.name !== p.name))}
@@ -180,24 +180,24 @@ function HomePage({
                     ))}
                   </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center border-2 border-dashed border-zinc-800 opacity-30 p-8">
-                    <p className="font-mono uppercase tracking-widest text-xs text-center">No players in tournament</p>
+                  <div className="h-full flex items-center justify-center border-2 border-dashed border-zinc-800 opacity-30 p-4 md:p-8">
+                    <p className="font-mono uppercase tracking-widest text-[10px] text-center">No players in tournament</p>
                   </div>
                 )}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-zinc-800 flex gap-2">
+              <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-zinc-800 flex gap-2">
                 <input 
                   type="text" 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                   placeholder="Player Name..."
-                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-2 px-3 focus:outline-none focus:border-green-500 text-white font-serif text-sm"
+                  className="flex-1 bg-zinc-800 border-2 border-zinc-700 py-1.5 md:py-2 px-3 focus:outline-none focus:border-green-500 text-white font-serif text-sm rounded-lg"
                 />
                 <button 
                   onClick={addPlayer}
-                  className="bg-green-600 hover:bg-green-500 px-4 font-bold uppercase tracking-widest text-[10px] transition-colors"
+                  className="bg-green-600 hover:bg-green-500 px-3 md:px-4 font-bold uppercase tracking-widest text-[8px] md:text-[10px] transition-colors rounded-lg"
                 >
                   Add
                 </button>
@@ -207,12 +207,12 @@ function HomePage({
 
           {/* Right: Game Selection Grid */}
           <div className="lg:col-span-8">
-            <div className="text-xs font-mono uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-4">
+            <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] md:tracking-[0.3em] text-zinc-500 mb-4 md:mb-6 flex items-center gap-4">
               <span className="flex-none">Select Mission</span>
               <div className="h-[1px] w-full bg-zinc-800"></div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => onSelectGame('301')}
                 disabled={players.length < 1}
@@ -432,17 +432,17 @@ function Game301({
   const currentPlayer = players[currentPlayerIndex];
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#050505]">
+    <div className="flex flex-col md:flex-row h-[100dvh] overflow-hidden bg-[#050505]">
       {/* Left Side: Scoreboard */}
-      <div className="flex-1 relative overflow-hidden flex flex-col border-r-8 border-[#1a1a1a]">
-        <div className="p-8 border-b border-white/5 flex justify-center items-center relative z-10">
+      <div className="flex-1 relative overflow-hidden flex flex-col border-b-4 md:border-b-0 md:border-r-8 border-[#1a1a1a]">
+        <div className="p-4 md:p-8 border-b border-white/5 flex justify-center items-center relative z-10">
           <div className="text-center">
-            <div className="text-xs font-mono uppercase tracking-[0.5em] text-red-500 mb-1">Championship Series</div>
-            <h2 className="text-4xl font-display italic font-black text-white">301 DOWN <span className="text-red-500">•</span> ROUND {Math.floor(players[0].history.length + 1)}</h2>
+            <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] md:tracking-[0.5em] text-red-500 mb-1">Championship Series</div>
+            <h2 className="text-3xl md:text-5xl font-display italic font-black text-white">301 DOWN <span className="text-red-500">•</span> ROUND {Math.floor(players[0].history.length + 1)}</h2>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-12 grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 content-start">
+        <div className="flex-1 overflow-y-auto p-4 md:p-12 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 relative z-10 content-start">
           {players.map((p, idx) => (
             <motion.div 
               key={idx} 
@@ -557,26 +557,26 @@ function Game301({
       </div>
 
       {/* Right Side: Input Panel */}
-      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-[#1a1a1a]">
-        <div className="mb-12">
-          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
-            <ArrowLeft size={14} /> Abort Mission
+      <div className="w-full md:w-[400px] lg:w-[480px] bg-zinc-950 text-white p-4 sm:p-8 flex flex-col shadow-2xl relative border-t-4 md:border-t-0 md:border-l-8 border-[#1a1a1a] overflow-y-auto">
+        <div className="mb-6 md:mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest mb-4 md:mb-8">
+            <ArrowLeft size={12} /> Abort Mission
           </button>
           
-          <div className="p-6 bg-red-600/10 border-2 border-red-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-red-400 mb-2">Active Player</div>
-            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="text-xs font-mono text-zinc-400">Current Score:</div>
-              <div className="text-3xl font-black text-white font-display">{players[currentPlayerIndex].score}</div>
+          <div className="p-4 md:p-6 bg-red-600/10 border-2 border-red-600 rounded-2xl mb-4 md:mb-8">
+            <div className="text-[8px] md:text-[10px] font-mono uppercase tracking-widest text-red-400 mb-1 md:mb-2">Active Player</div>
+            <div className="text-2xl md:text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-2 md:mt-4">
+              <div className="text-[10px] font-mono text-zinc-400 uppercase">Current Score:</div>
+              <div className="text-xl md:text-3xl font-black text-white font-display">{players[currentPlayerIndex].score}</div>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             {[0, 1, 2].map(dartIdx => (
               <div 
                 key={dartIdx}
-                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                className={`flex-1 h-12 md:h-16 border-2 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
                     ? 'bg-red-600 border-red-500 text-white' 
                     : dartIdx === currentDartIndex 
@@ -584,24 +584,25 @@ function Game301({
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
-                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={16} className="opacity-20" />}
               </div>
             ))}
           </div>
         </div>
 
         {/* Multiplier Toggles */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
           {[1, 2, 3].map((m) => (
             <button
               key={m}
               onClick={() => setMultiplier(m as 1 | 2 | 3)}
-              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
+              className={`py-2 md:py-4 font-black font-display italic text-lg md:text-2xl border-2 transition-all rounded-xl ${
                 multiplier === m 
                   ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]' 
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
               }`}
             >
+              <div className="text-[8px] md:text-[10px] font-mono uppercase opacity-40 mb-0.5 md:mb-1">Multiplier</div>
               {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
             </button>
           ))}
@@ -798,18 +799,18 @@ function GameMoon({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#050505]">
+    <div className="flex flex-col md:flex-row h-[100dvh] overflow-hidden bg-[#050505]">
       {/* Left Side: Space Visualization */}
-      <div className="flex-1 relative overflow-hidden flex flex-col items-center justify-between p-12 border-r-8 border-[#1a1a1a]">
+      <div className="flex-1 relative overflow-hidden flex flex-col items-center justify-between p-4 md:p-12 border-b-4 md:border-b-0 md:border-r-8 border-[#1a1a1a]">
         {/* Stars Background */}
-        <div className="absolute inset-0 z-0 opacity-40">
-          {Array.from({ length: 50 }).map((_, i) => (
+        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+          {Array.from({ length: 30 }).map((_, i) => (
             <div 
               key={i} 
               className="absolute bg-white rounded-full"
               style={{
-                width: Math.random() * 3 + 'px',
-                height: Math.random() * 3 + 'px',
+                width: Math.random() * 2 + 'px',
+                height: Math.random() * 2 + 'px',
                 top: Math.random() * 100 + '%',
                 left: Math.random() * 100 + '%',
                 opacity: Math.random()
@@ -819,28 +820,27 @@ function GameMoon({
         </div>
 
         {/* Moon (Top) */}
-        <div className="relative z-20 text-center mb-8">
-          <div className="text-xs font-mono uppercase tracking-[0.5em] text-yellow-400 mb-2">Lunar Mission</div>
-          <h2 className="text-5xl font-display italic font-black text-white">ROUND {round}<span className="text-yellow-400">/{MAX_ROUNDS}</span></h2>
+        <div className="relative z-20 text-center mb-2 md:mb-8">
+          <div className="hidden md:block text-[10px] font-mono uppercase tracking-[0.5em] text-yellow-400 mb-2">Lunar Mission</div>
+          <h2 className="text-xl md:text-5xl font-display italic font-black text-white">ROUND {round}<span className="text-yellow-400">/{MAX_ROUNDS}</span></h2>
         </div>
 
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-          className="relative z-10 w-48 h-48 rounded-full bg-zinc-300 shadow-[0_0_100px_rgba(255,255,255,0.2)] flex items-center justify-center overflow-hidden"
+          className="relative z-10 w-24 h-24 md:w-48 md:h-48 rounded-full bg-zinc-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] md:shadow-[0_0_100px_rgba(255,255,255,0.2)] flex items-center justify-center overflow-hidden"
         >
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-          <div className="w-12 h-12 rounded-full bg-zinc-400/50 absolute top-10 left-10"></div>
-          <div className="w-8 h-8 rounded-full bg-zinc-400/50 absolute bottom-12 right-16"></div>
-          <div className="w-6 h-6 rounded-full bg-zinc-400/50 absolute top-24 right-8"></div>
+          <div className="w-6 h-6 md:w-12 md:h-12 rounded-full bg-zinc-400/50 absolute top-4 left-4 md:top-10 md:left-10"></div>
+          <div className="w-4 h-4 md:w-8 md:h-8 rounded-full bg-zinc-400/50 absolute bottom-6 right-8 md:bottom-12 md:right-16"></div>
         </motion.div>
 
         {/* Race Tracks */}
-        <div className="flex-1 w-full flex justify-around items-end relative z-10 px-10">
+        <div className="flex-1 w-full flex justify-around items-end relative z-10 px-2 md:px-10">
           {players.map((p, idx) => (
-            <div key={idx} className="flex flex-col items-center h-full justify-end relative w-24">
+            <div key={idx} className="flex flex-col items-center h-full justify-end relative w-16 md:w-24">
               {/* Step Markers */}
-              <div className="absolute inset-0 flex flex-col justify-between py-10 opacity-10">
+              <div className="absolute inset-0 flex flex-col justify-between py-4 md:py-10 opacity-10 pointer-events-none">
                 {Array.from({ length: 11 }).map((_, i) => (
                   <div key={i} className="w-full h-[1px] bg-white"></div>
                 ))}
@@ -850,59 +850,35 @@ function GameMoon({
               <motion.div
                 animate={{ 
                   bottom: `${(p.moonSteps || 0) * 10}%`,
-                  scale: idx === currentPlayerIndex ? 1.2 : 1,
-                  filter: idx === currentPlayerIndex ? 'drop-shadow(0 0 15px #eab308)' : 'none'
+                  scale: idx === currentPlayerIndex ? 1.1 : 0.9,
+                  filter: idx === currentPlayerIndex ? 'drop-shadow(0 0 10px #eab308)' : 'none'
                 }}
-                className="relative z-20 mb-4"
+                className="relative z-20 mb-1 md:mb-4"
               >
-                <div className={`p-4 rounded-xl ${idx === currentPlayerIndex ? 'bg-yellow-500' : 'bg-zinc-800'} text-white shadow-xl`}>
-                  <Target size={32} className={idx === currentPlayerIndex ? 'animate-pulse' : ''} />
+                <div className={`p-2 md:p-4 rounded-lg md:rounded-xl ${idx === currentPlayerIndex ? 'bg-yellow-500' : 'bg-zinc-800'} text-white shadow-xl`}>
+                  <Rocket size={idx === currentPlayerIndex ? 24 : 18} className={idx === currentPlayerIndex ? 'animate-bounce' : ''} />
                 </div>
-                {/* Flame effect */}
-                {idx === currentPlayerIndex && (
-                  <motion.div 
-                    animate={{ scaleY: [1, 1.5, 1], opacity: [0.5, 0.8, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 0.2 }}
-                    className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-4 h-8 bg-gradient-to-t from-transparent via-orange-500 to-yellow-400 rounded-full"
-                  />
-                )}
+                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] md:text-[10px] font-mono whitespace-nowrap opacity-60 font-bold bg-black/40 px-1 rounded">{p.name}</div>
               </motion.div>
 
-              {/* Player Info */}
-              <div className="text-center mt-4">
-                <div className={`text-xs font-mono uppercase tracking-tighter mb-1 ${idx === currentPlayerIndex ? 'text-yellow-400 font-bold' : 'text-zinc-500'}`}>
-                  {p.name}
-                </div>
-                <div className="text-2xl font-black font-display italic text-white">
-                  #{p.targetNumber}
-                </div>
-                <div className="text-[10px] font-mono text-zinc-600 mt-1">
-                  {p.moonSteps}/10 STEPS
-                </div>
-              </div>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Earth (Bottom) */}
-        <div className="relative z-10 w-full h-32 bg-yellow-900/20 rounded-t-[100%] shadow-[0_-20px_100px_rgba(234,179,8,0.3)] flex items-center justify-center overflow-hidden border-t-4 border-yellow-400/30">
-          <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-          <div className="text-white/20 font-black text-6xl italic font-display tracking-widest uppercase">EARTH</div>
-        </div>
-
-        {/* Win Overlay */}
+      {/* Win Overlay */}
         {gameState === 'won' && winner && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             className="absolute inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center overflow-y-auto"
           >
-            <Trophy size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
-            <h2 className="text-xl font-mono uppercase tracking-[0.5em] text-yellow-400 mb-2">Mission Accomplished</h2>
-            <h3 className="text-6xl font-display italic font-black text-white mb-10">{winner.name} Reached the Moon!</h3>
+            <Trophy size={60} className="text-yellow-400 mb-4 md:mb-6 md:size-[80px] drop-shadow-[0_0_30px_rgba(250,204,21,0.5)]" />
+            <h2 className="text-sm md:text-xl font-mono uppercase tracking-[0.3em] md:tracking-[0.5em] text-yellow-400 mb-2">Mission Accomplished</h2>
+            <h3 className="text-3xl md:text-6xl font-display italic font-black text-white mb-6 md:mb-10">{winner.name} Reached the Moon!</h3>
             
-            <div className="w-full max-w-2xl mb-12 bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden">
-              <div className="grid grid-cols-4 gap-4 p-6 border-b border-zinc-800 text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
+            <div className="w-full max-w-2xl mb-8 md:mb-12 bg-zinc-900/50 border border-zinc-800 rounded-2xl md:rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-2 md:gap-4 p-4 md:p-6 border-b border-zinc-800 text-[10px] md:text-xs font-mono uppercase tracking-widest text-zinc-500 bg-zinc-900/80">
                 <div className="text-left">Pos</div>
                 <div className="text-left">Player</div>
                 <div className="text-right">Steps Left</div>
@@ -914,11 +890,11 @@ function GameMoon({
                 const gap = i === 0 ? '-' : `+${score - winnerScore}`;
                 
                 return (
-                  <div key={p.name} className={`grid grid-cols-4 gap-4 p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-yellow-500/5' : ''}`}>
-                    <div className="text-left font-mono text-zinc-400">#{i + 1}</div>
-                    <div className="text-left font-display italic font-bold text-white text-xl">{p.name}</div>
-                    <div className="text-right font-mono text-2xl font-black text-white">{score}</div>
-                    <div className="text-right font-mono text-zinc-500">{gap}</div>
+                  <div key={p.name} className={`grid grid-cols-4 gap-2 md:gap-4 p-4 md:p-6 border-b border-zinc-900/50 items-center ${p.name === winner.name ? 'bg-yellow-500/5' : ''}`}>
+                    <div className="text-left font-mono text-zinc-400 text-xs md:text-base">#{i + 1}</div>
+                    <div className="text-left font-display italic font-bold text-white text-base md:text-xl">{p.name}</div>
+                    <div className="text-right font-mono text-xl md:text-2xl font-black text-white">{score}</div>
+                    <div className="text-right font-mono text-[10px] md:text-base text-zinc-500">{gap}</div>
                   </div>
                 );
               })}
@@ -932,29 +908,28 @@ function GameMoon({
             </button>
           </motion.div>
         )}
-      </div>
 
       {/* Right Side: Input Panel */}
-      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-[#1a1a1a]">
-        <div className="mb-12">
-          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
-            <ArrowLeft size={14} /> Abort Mission
+      <div className="w-full md:w-[400px] lg:w-[480px] bg-zinc-950 text-white p-4 sm:p-8 flex flex-col shadow-2xl relative border-t-4 md:border-t-0 md:border-l-8 border-[#1a1a1a] overflow-y-auto">
+        <div className="mb-6 md:mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest mb-4 md:mb-8">
+            <ArrowLeft size={12} /> Abort Mission
           </button>
           
-          <div className="p-6 bg-yellow-600/10 border-2 border-yellow-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-yellow-400 mb-2">Current Pilot</div>
-            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="text-xs font-mono text-zinc-400">Target Number:</div>
-              <div className="text-3xl font-black text-white font-display">#{players[currentPlayerIndex].targetNumber}</div>
+          <div className="p-3 md:p-6 bg-yellow-600/10 border-2 border-yellow-600 rounded-2xl mb-4 md:mb-8">
+            <div className="text-[8px] md:text-[10px] font-mono uppercase tracking-widest text-yellow-400 mb-1 md:mb-2">Current Pilot</div>
+            <div className="text-xl md:text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-1 md:mt-4">
+              <div className="text-[8px] md:text-[10px] font-mono text-zinc-400 uppercase">Target Number:</div>
+              <div className="text-lg md:text-3xl font-black text-white font-display">#{players[currentPlayerIndex].targetNumber}</div>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             {[0, 1, 2].map(dartIdx => (
               <div 
                 key={dartIdx}
-                className={`flex-1 h-12 border-2 rounded-lg flex items-center justify-center font-mono text-lg font-bold transition-all ${
+                className={`flex-1 h-12 md:h-16 border-2 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
                     ? 'bg-yellow-600 border-yellow-500 text-white' 
                     : dartIdx === currentDartIndex 
@@ -969,18 +944,18 @@ function GameMoon({
         </div>
 
         {/* Multiplier Selection */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
           {[1, 2, 3].map((m) => (
             <button
               key={m}
               onClick={() => setMultiplier(m as 1 | 2 | 3)}
-              className={`py-4 font-black font-display italic text-lg border-2 transition-all rounded-xl ${
+              className={`py-2 md:py-4 font-black font-display italic text-base md:text-lg border-2 transition-all rounded-xl ${
                 multiplier === m 
                   ? 'bg-yellow-500 border-yellow-400 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] scale-105' 
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
               }`}
             >
-              <div className="text-[8px] font-mono uppercase opacity-40 mb-1">Boost</div>
+              <div className="text-[8px] font-mono uppercase opacity-40 mb-0.5 md:mb-1">Boost</div>
               {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
             </button>
           ))}
@@ -994,17 +969,17 @@ function GameMoon({
                 key={num}
                 onClick={() => handleScoreInput(num)}
                 disabled={gameState !== 'playing' || isWaiting}
-                className={`h-24 flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 rounded-xl ${
+                className={`h-20 md:h-24 flex flex-col items-center justify-center border-2 transition-all active:scale-95 disabled:opacity-10 rounded-xl ${
                   num === players[currentPlayerIndex].targetNumber
                     ? 'border-yellow-500 bg-yellow-600/20 text-white hover:bg-yellow-600 shadow-[0_0_20px_rgba(234,179,8,0.2)]'
                     : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
                 }`}
               >
-                <div className="text-xs font-mono uppercase opacity-40 mb-1">Target</div>
-                <span className="text-4xl font-black font-display italic">{num}</span>
-                <div className="flex gap-1 mt-2">
+                <div className="text-[10px] font-mono uppercase opacity-40 mb-0.5">Target</div>
+                <span className="text-2xl md:text-4xl font-black font-display italic">{num}</span>
+                <div className="flex gap-1 mt-1">
                   {players.filter(p => p.targetNumber === num).map((p, i) => (
-                    <span key={i} className="text-[10px] font-mono uppercase bg-white/10 px-2 py-0.5 rounded">
+                    <span key={i} className="text-[8px] md:text-[10px] font-mono uppercase bg-white/10 px-1.5 py-0.5 rounded">
                       {p.name.slice(0, 3)}
                     </span>
                   ))}
@@ -1153,26 +1128,24 @@ function GameAround({
   const currentTarget = players[currentPlayerIndex].aroundNumber || 1;
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#050505]">
+    <div className="flex flex-col md:flex-row h-[100dvh] overflow-hidden bg-[#050505]">
       {/* Left Side: Visualization */}
-      <div className="flex-1 relative flex flex-col items-center justify-center p-12 overflow-hidden">
+      <div className="flex-1 relative flex flex-col items-center justify-center p-4 md:p-12 overflow-hidden border-b-4 md:border-b-0 md:border-r-8 border-[#1a1a1a]">
         {/* Background Globe Effect */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-blue-500/20"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-blue-500/10"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-blue-500/10 rotate-45"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-px bg-blue-500/10 -rotate-45"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[800px] md:h-[800px] rounded-full border border-blue-500/20"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full border border-blue-500/10"></div>
         </div>
 
-        <div className="relative z-10 text-center mb-12">
-          <div className="text-xs font-mono uppercase tracking-[0.5em] text-blue-500 mb-2">Global Expedition</div>
-          <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-blue-500">/{MAX_ROUNDS}</span></h2>
+        <div className="relative z-10 text-center mb-4 md:mb-12">
+          <div className="text-[10px] font-mono uppercase tracking-[0.3em] md:tracking-[0.5em] text-blue-500 mb-1 md:mb-2">Global Expedition</div>
+          <h2 className="text-3xl md:text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-blue-500">/{MAX_ROUNDS}</span></h2>
         </div>
 
         {/* The Globe / Dartboard */}
-        <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
+        <div className="relative w-[240px] h-[240px] md:w-[500px] md:h-[500px]">
           {/* Globe Sphere */}
-          <div className="absolute inset-0 rounded-full bg-blue-900 border-4 border-zinc-800 shadow-[0_0_100px_rgba(37,99,235,0.2)] overflow-hidden">
+          <div className="absolute inset-0 rounded-full bg-blue-900 border-4 border-zinc-800 shadow-[0_0_40px_rgba(37,99,235,0.2)] md:shadow-[0_0_100px_rgba(37,99,235,0.2)] overflow-hidden">
             {/* Earth Landmasses (Abstract) */}
             <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full opacity-40">
               <path d="M20,40 C30,30 40,30 50,40 S70,50 80,40 S90,60 80,70 S60,80 40,75 S10,60 20,40" fill="#60a5fa" />
@@ -1227,7 +1200,7 @@ function GameAround({
           </div>
 
           {/* Target Indicator */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-black font-display text-4xl px-6 py-2 italic font-black shadow-lg">
+          <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-black font-display text-2xl md:text-4xl px-4 md:px-6 py-1 md:py-2 italic font-black shadow-lg whitespace-nowrap">
             TARGET: {currentTarget}
           </div>
 
@@ -1236,7 +1209,7 @@ function GameAround({
             <div 
               key={i}
               className="absolute inset-0 pointer-events-none"
-              style={{ padding: `${i * 15}px` }}
+              style={{ padding: `${i * (window.innerWidth < 768 ? 8 : 15)}px` }}
             >
               <div 
                 className={`w-full h-full rounded-full border-2 transition-all duration-1000 ${i === currentPlayerIndex ? 'border-blue-500 opacity-100' : 'border-white/10 opacity-30'}`}
@@ -1249,16 +1222,16 @@ function GameAround({
         </div>
 
         {/* Player List / Progress */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+        <div className="mt-8 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 w-full max-w-4xl">
           {players.map((p, i) => (
             <div 
               key={i} 
-              className={`p-4 border-2 transition-all ${i === currentPlayerIndex ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-800 bg-black/40'}`}
+              className={`p-2 md:p-4 border-2 transition-all ${i === currentPlayerIndex ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-800 bg-black/40'}`}
             >
-              <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{p.name}</div>
+              <div className="text-[8px] md:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-0.5 md:mb-1">{p.name}</div>
               <div className="flex justify-between items-end">
-                <div className="text-3xl font-display italic font-black text-white">{p.aroundNumber}/20</div>
-                <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="text-xl md:text-3xl font-display italic font-black text-white">{p.aroundNumber}/20</div>
+                <div className="w-8 md:w-12 h-1 bg-zinc-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-blue-500 transition-all duration-500"
                     style={{ width: `${((p.aroundNumber || 1) / 20) * 100}%` }}
@@ -1313,26 +1286,26 @@ function GameAround({
       </div>
 
       {/* Right Side: Input Panel */}
-      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-zinc-900">
-        <div className="mb-12">
-          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
-            <ArrowLeft size={14} /> Abandon Mission
+      <div className="w-full md:w-[400px] lg:w-[480px] bg-zinc-950 text-white p-4 sm:p-8 flex flex-col shadow-2xl relative border-t-4 md:border-t-0 md:border-l-8 border-zinc-900 overflow-y-auto">
+        <div className="mb-6 md:mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest mb-4 md:mb-8">
+            <ArrowLeft size={12} /> Abandon Mission
           </button>
           
-          <div className="p-6 bg-blue-600/10 border-2 border-blue-600 rounded-2xl mb-8">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-2">Current Player</div>
-            <div className="text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="text-xs font-mono text-zinc-400">Next Target:</div>
-              <div className="text-3xl font-black text-white font-display">#{currentTarget}</div>
+          <div className="p-4 md:p-6 bg-blue-600/10 border-2 border-blue-600 rounded-2xl mb-4 md:mb-8">
+            <div className="text-[8px] md:text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-1 md:mb-2">Current Player</div>
+            <div className="text-2xl md:text-4xl font-display italic font-black uppercase">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 mt-2 md:mt-4">
+              <div className="text-[10px] font-mono text-zinc-400 uppercase">Next Target:</div>
+              <div className="text-xl md:text-3xl font-black text-white font-display">#{currentTarget}</div>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             {[0, 1, 2].map(dartIdx => (
               <div 
                 key={dartIdx}
-                className={`flex-1 h-16 border-2 rounded-xl flex items-center justify-center font-mono text-xl font-bold transition-all ${
+                className={`flex-1 h-12 md:h-16 border-2 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
                     ? 'bg-blue-600 border-blue-500 text-black' 
                     : dartIdx === currentDartIndex 
@@ -1340,54 +1313,54 @@ function GameAround({
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
-                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={20} className="opacity-20" />}
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={16} className="opacity-20" />}
               </div>
             ))}
           </div>
         </div>
 
         {/* Input Controls */}
-        <div className="flex-1 flex flex-col gap-6 mb-8">
+        <div className="flex-1 flex flex-col gap-4 md:gap-6 mb-4 md:mb-8">
           {/* Multiplier Selection */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
             {[1, 2, 3].map((m) => (
               <button
                 key={m}
                 onClick={() => setMultiplier(m as 1 | 2 | 3)}
-                className={`py-6 font-black font-display italic text-xl border-2 transition-all rounded-2xl ${
+                className={`py-2 md:py-6 font-black font-display italic text-lg md:text-xl border-2 transition-all rounded-xl md:rounded-2xl ${
                   multiplier === m 
                     ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_30px_rgba(37,99,235,0.4)] scale-105' 
                     : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
                 }`}
               >
-                <div className="text-[10px] font-mono uppercase opacity-40 mb-1">Multiplier</div>
+                <div className="text-[8px] md:text-[10px] font-mono uppercase opacity-40 mb-0.5 md:mb-1">Multiplier</div>
                 {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
               </button>
             ))}
           </div>
 
           {/* Relevant Numbers Only */}
-          <div className="flex-1 flex flex-col gap-4">
+          <div className="flex-1 flex flex-col gap-2 md:gap-4">
             <button
               onClick={() => handleScoreInput(currentTarget)}
               disabled={gameState !== 'playing' || isWaiting}
-              className="flex-1 flex flex-col items-center justify-center border-4 border-blue-600 bg-blue-600/10 text-white hover:bg-blue-600 hover:text-black transition-all active:scale-95 disabled:opacity-10 rounded-3xl group relative overflow-hidden"
+              className="flex-1 flex flex-col items-center justify-center border-4 border-blue-600 bg-blue-600/10 text-white hover:bg-blue-600 hover:text-black transition-all active:scale-95 disabled:opacity-10 rounded-2xl md:rounded-3xl group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="text-sm font-mono uppercase tracking-[0.5em] text-blue-400 mb-2 group-hover:text-black transition-colors">Current Target</div>
-              <span className="text-9xl font-black font-display italic drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">
+              <div className="text-xs md:text-sm font-mono uppercase tracking-[0.3em] md:tracking-[0.5em] text-blue-400 mb-1 md:mb-2 group-hover:text-black transition-colors">Current Target</div>
+              <span className="text-6xl md:text-9xl font-black font-display italic drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">
                 {currentTarget}
               </span>
-              <div className="mt-4 flex items-center gap-2 text-blue-400 group-hover:text-black transition-colors">
+              <div className="mt-2 md:mt-4 flex items-center gap-2 text-blue-400 group-hover:text-black transition-colors">
                 <Target size={24} />
-                <span className="font-mono text-xs uppercase tracking-widest">Hit to Advance</span>
+                <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest">Hit to Advance</span>
               </div>
             </button>
             
             <button
               onClick={() => handleScoreInput(0)}
               disabled={gameState !== 'playing' || isWaiting}
-              className="py-8 text-3xl font-black font-display italic tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-2xl bg-zinc-900/50 text-zinc-400"
+              className="py-4 md:py-8 text-xl md:text-3xl font-black font-display italic tracking-[0.2em] md:tracking-[0.4em] border-2 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 disabled:opacity-10 transition-all active:scale-95 rounded-xl md:rounded-2xl bg-zinc-900/50 text-zinc-400"
             >
               MISS
             </button>
@@ -1625,23 +1598,23 @@ function GameFootball({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#051a05]">
+    <div className="flex flex-col md:flex-row h-[100dvh] overflow-hidden bg-[#051a05]">
       {/* Left Side: Field Visualization */}
-      <div className="flex-1 relative flex flex-col items-center justify-center p-8 overflow-hidden">
+      <div className="flex-1 relative flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden border-b-4 md:border-b-0 md:border-r-8 border-emerald-900/30">
         {/* Grass Texture Overlay */}
         <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
         
         {/* Field Boundary */}
-        <div className="relative w-full max-w-4xl aspect-[1.6/1] border-4 border-white/40 rounded-sm bg-emerald-900/40 shadow-2xl overflow-hidden">
+        <div className="relative w-full max-w-4xl aspect-[1.6/1] border-2 md:border-4 border-white/40 rounded-sm bg-emerald-900/40 shadow-2xl overflow-hidden">
           {/* Field Markings */}
           <div className="absolute inset-0 pointer-events-none">
             {/* Center Line */}
-            <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-white/30"></div>
+            <div className="absolute top-0 bottom-0 left-1/2 w-0.5 md:w-1 bg-white/30"></div>
             {/* Center Circle */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-4 border-white/30 rounded-full"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-40 md:h-40 border-2 md:border-4 border-white/30 rounded-full"></div>
             {/* Penalty Areas */}
-            <div className="absolute top-1/4 bottom-1/4 left-0 w-32 border-4 border-white/30 border-l-0"></div>
-            <div className="absolute top-1/4 bottom-1/4 right-0 w-32 border-4 border-white/30 border-r-0"></div>
+            <div className="absolute top-1/4 bottom-1/4 left-0 w-16 md:w-32 border-2 md:border-4 border-white/30 border-l-0"></div>
+            <div className="absolute top-1/4 bottom-1/4 right-0 w-16 md:w-32 border-2 md:border-4 border-white/30 border-r-0"></div>
           </div>
 
           {/* Connections (Lines) */}
@@ -1826,21 +1799,21 @@ function GameFootball({
         </div>
 
         {/* Input Controls */}
-        <div className="flex-1 flex flex-col gap-6 mb-8">
+        <div className="flex-1 flex flex-col gap-4 md:gap-6 mb-4 md:mb-8">
           {/* Multiplier Selection */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
             {[1, 2, 3].map((m) => (
               <button
                 key={m}
                 onClick={() => setMultiplier(m as 1 | 2 | 3)}
                 disabled={showGoalAnimation}
-                className={`py-6 font-black font-display italic text-xl border-2 transition-all rounded-2xl ${
+                className={`py-2 md:py-6 font-black font-display italic text-lg md:text-xl border-2 transition-all rounded-xl md:rounded-2xl ${
                   multiplier === m 
                     ? 'bg-emerald-600 border-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)] scale-105' 
                     : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 bg-zinc-900/30'
                 }`}
               >
-                <div className="text-[10px] font-mono uppercase opacity-40 mb-1">Multiplier</div>
+                <div className="text-[8px] md:text-[10px] font-mono uppercase opacity-40 mb-0.5 md:mb-1">Multiplier</div>
                 {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
               </button>
             ))}
@@ -2072,13 +2045,13 @@ function GameAsteroids({
           ))}
         </div>
 
-        <div className="absolute top-12 left-12 z-10 text-left">
-          <div className="text-xs font-mono uppercase tracking-[0.5em] text-zinc-500 mb-2">Asteroid Belt</div>
-          <h2 className="text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-zinc-500">/{MAX_ROUNDS}</span></h2>
-          <div className="mt-10 flex flex-col gap-6 text-4xl font-mono text-zinc-400 uppercase tracking-widest">
-            <span className="flex items-center gap-6"><span className="text-6xl">👽</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">1P</span></span>
-            <span className="flex items-center gap-6"><span className="text-6xl">🚀</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">3P</span></span>
-            <span className="flex items-center gap-6"><span className="text-6xl">🪐</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">5P</span></span>
+        <div className="relative md:absolute top-0 md:top-12 left-0 md:left-12 z-10 text-center md:text-left p-4 md:p-0">
+          <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] md:tracking-[0.5em] text-zinc-500 mb-1 md:mb-2">Asteroid Belt</div>
+          <h2 className="text-3xl md:text-6xl font-display italic font-black text-white">ROUND {round}<span className="text-zinc-500">/{MAX_ROUNDS}</span></h2>
+          <div className="mt-4 md:mt-10 flex flex-row md:flex-col justify-center md:justify-start gap-4 md:gap-6 text-xl md:text-4xl font-mono text-zinc-400 uppercase tracking-widest">
+            <span className="flex items-center gap-2 md:gap-6"><span className="text-2xl md:text-6xl">👽</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">1P</span></span>
+            <span className="flex items-center gap-2 md:gap-6"><span className="text-2xl md:text-6xl">🚀</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">3P</span></span>
+            <span className="flex items-center gap-2 md:gap-6"><span className="text-2xl md:text-6xl">🪐</span> <span className="text-zinc-600">=</span> <span className="text-white font-black">5P</span></span>
           </div>
         </div>
 
@@ -2286,51 +2259,52 @@ function GameAsteroids({
       </div>
 
       {/* Right Side: Input Panel */}
-      <div className="w-full md:w-[480px] bg-zinc-950 text-white p-8 flex flex-col shadow-2xl relative border-l-8 border-zinc-900">
-        <div className="mb-12">
-          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-xs uppercase tracking-widest mb-8">
-            <ArrowLeft size={14} /> Abandon Mission
+      <div className="w-full md:w-[400px] lg:w-[480px] bg-zinc-950 text-white p-4 sm:p-8 flex flex-col shadow-2xl relative border-t-4 md:border-t-0 md:border-l-8 border-zinc-900 overflow-y-auto">
+        <div className="mb-6 md:mb-12">
+          <button onClick={onGoHome} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest mb-4 md:mb-8">
+            <ArrowLeft size={12} /> Abandon Mission
           </button>
           
-          <div className="p-8 bg-zinc-600/10 border-2 border-zinc-600 rounded-2xl mb-10">
-            <div className="text-sm font-mono uppercase tracking-[0.3em] text-zinc-400 mb-4">Current Pilot</div>
-            <div className="text-6xl font-display italic font-black uppercase mb-6">{players[currentPlayerIndex].name}</div>
-            <div className="flex items-center gap-6 pt-6 border-t border-zinc-800">
-              <div className="text-base font-mono text-zinc-500 uppercase tracking-widest">Total Score:</div>
-              <div className="text-5xl font-black text-white font-display italic">{players[currentPlayerIndex].asteroidsScore || 0}</div>
+          <div className="p-4 md:p-8 bg-zinc-600/10 border-2 border-zinc-600 rounded-2xl mb-4 md:mb-10">
+            <div className="text-[8px] md:text-sm font-mono uppercase tracking-[0.3em] text-zinc-400 mb-1 md:mb-4">Current Pilot</div>
+            <div className="text-2xl md:text-6xl font-display italic font-black uppercase mb-2 md:mb-6">{players[currentPlayerIndex].name}</div>
+            <div className="flex items-center gap-4 md:gap-6 pt-4 md:pt-6 border-t border-zinc-800">
+              <div className="text-[10px] md:text-base font-mono text-zinc-500 uppercase tracking-widest">Total Score:</div>
+              <div className="text-2xl md:text-5xl font-black text-white font-display italic">{players[currentPlayerIndex].asteroidsScore || 0}</div>
             </div>
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex gap-2 md:gap-4">
             {[0, 1, 2].map(dartIdx => (
               <div 
                 key={dartIdx}
-                className={`flex-1 h-24 border-2 rounded-2xl flex items-center justify-center font-mono text-3xl font-bold transition-all ${
+                className={`flex-1 h-12 md:h-16 border-2 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-bold transition-all ${
                   dartIdx < currentDartIndex 
-                    ? 'bg-zinc-600 border-zinc-500 text-black' 
+                    ? 'bg-zinc-600 border-zinc-500 text-white' 
                     : dartIdx === currentDartIndex 
                       ? 'border-zinc-500 text-zinc-500 animate-pulse' 
                       : 'border-zinc-800 text-zinc-800'
                 }`}
               >
-                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={32} className="opacity-20" />}
+                {currentTurnDarts[dartIdx] !== undefined ? currentTurnDarts[dartIdx] : <Target size={16} className="opacity-20" />}
               </div>
             ))}
           </div>
         </div>
 
         {/* Multiplier Toggles */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
           {[1, 2, 3].map((m) => (
             <button
               key={m}
               onClick={() => setMultiplier(m as 1 | 2 | 3)}
-              className={`py-4 font-black font-display italic text-2xl border-2 transition-all ${
+              className={`py-2 md:py-4 font-black font-display italic text-lg md:text-2xl border-2 transition-all rounded-xl ${
                 multiplier === m 
                   ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
                   : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
               }`}
             >
+              <div className="text-[8px] md:text-[10px] font-mono uppercase opacity-40 mb-0.5 md:mb-1">Multiplier</div>
               {m === 1 ? 'SINGLE' : m === 2 ? 'DOUBLE' : 'TRIPLE'}
             </button>
           ))}
